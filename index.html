@@ -18,7 +18,7 @@
             <div class="set-queue-wrapper">
                 <div class="current-patient">
                     <p class="definition">Current patient:</p>
-                    <p class="output-info">Fyodor Dostoevsky</p>
+                    <p id="patient-current-patient" class="output-info">Queue is empty</p>
                 </div>
                 <div class="add-patient-box">
                     <input type="text" placeholder="Input to add patient" id="addPatient">
@@ -27,10 +27,10 @@
             </div>
             <div class="search-resolution-wrapper">
                 <div class="search-patient-box">
-                    <input type="search" id="searchResolution">
-                    <button class="bn1" type="button">Search Resolution</button>
+                    <input id="resolution-search-input-patient" type="search">
+                    <button class="bn1" type="button" onclick="getResolutionForPatient()">Search Resolution</button>
                 </div>
-                <div class="resolution-info-box">
+                <div id="patient-resolution-info" class="resolution-info-box">
                 </div>
             </div>
         </div>
@@ -38,26 +38,26 @@
             <div class="current-patient-wrapper">
                 <div class="current-patient">
                     <p class="definition">Current patient:</p>
-                    <p id="fedya" class="output-info">Fyodor Dostoevsky</p>
+                    <p id="doctors-current-patient" class="output-info">Queue is empty</p>
                 </div>
                 <div class="next-button-wrap">
-                    <button class="next-patient-btn" class="bn1" type="button">Next</button>
+                    <button class="next-patient-btn" class="bn1" type="button" onclick="nextPatient()">Next</button>
                 </div>
             </div>
             <div class="set-resolution-wrapper">
                 <p class="definition">Set appointment resolution</p>
                 <textarea id="set-resolution" rows="7" cols="80"></textarea>
-                <button class="bn1" type="button" onclick="setResolution();">Add</button>
+                <button class="bn1" type="button" onclick="setResolution()">Add</button>
             </div>
             <div class="delete-resolution-wrapper">
                 <div class="search-patient-box">
-                    <input type="search" id="searchResolution">
-                    <button class="bn1" type="button">Search Resolution</button>
+                    <input type="search" id="resolution-search-input">
+                    <button class="bn1" type="button" onclick="getResolutionForDoctor()">Search Resolution</button>
                 </div>
-                <div class="resolution-info-box"></div>
-
+                <div id="doctor-resolution-info"class="resolution-info-box"></div>
+                <button class="bn1" type="button" onclick="deleteResolution()">Delete Resolution</button>
             </div>
-        </div>
+        </div>  
     </div>
     </div>
     <style>
