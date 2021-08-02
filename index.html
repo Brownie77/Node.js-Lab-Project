@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="patient-view">
+            <div class="set-queue-wrapper">
+                <div class="current-patient">
+                    <p class="definition">Current patient:</p>
+                    <p class="output-info">Fyodor Dostoevsky</p>
+                </div>
+                <div class="add-patient-box">
+                    <input type="text" placeholder="Input to add patient" id="addPatient">
+                    <button class="bn1" type="button" onclick="addNewPatient();">Get Value</button>
+                </div>
+            </div>
+            <div class="search-resolution-wrapper">
+                <div class="search-patient-box">
+                    <input type="search" id="searchResolution">
+                    <button class="bn1" type="button">Search Resolution</button>
+                </div>
+                <div class="resolution-info-box">
+                </div>
+            </div>
+        </div>
+        <div class="doctor-view">
+            <div class="current-patient-wrapper">
+                <div class="current-patient">
+                    <p class="definition">Current patient:</p>
+                    <p id="fedya" class="output-info">Fyodor Dostoevsky</p>
+                </div>
+                <div class="next-button-wrap">
+                    <button class="next-patient-btn" class="bn1" type="button">Next</button>
+                </div>
+            </div>
+            <div class="set-resolution-wrapper">
+                <p class="definition">Set appointment resolution</p>
+                <textarea id="set-resolution" rows="7" cols="80"></textarea>
+                <button class="bn1" type="button" onclick="setResolution();">Add</button>
+            </div>
+            <div class="delete-resolution-wrapper">
+                <div class="search-patient-box">
+                    <input type="search" id="searchResolution">
+                    <button class="bn1" type="button">Search Resolution</button>
+                </div>
+                <div class="resolution-info-box"></div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap');
+    </style>
+    <script src="main.js"></script>
+</body>
+
+</html>
