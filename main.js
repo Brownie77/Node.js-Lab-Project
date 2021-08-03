@@ -1,33 +1,43 @@
 let queue = [];
-const patientData = [{
-    name: 'Fyodor',
-    resolution: 'sick sick sick'
-}, {
-    name: 'Kirill',
-    resolution: 'health, health, health'
-}];
 
+let currentPatient = queue[0];
+const patientData = [];
+//addNewPatient - добавить провеку на наличие имени в списке, если есть = добавить предуприждение 
 function addNewPatient() {
-    // Selecting the input element and get its value 
     let inputVal = document.getElementById("addPatient").value;
-    queue.unshift(inputVal);
-    patientData.push({
-        name: inputVal,
-        resolution: "empty"
-    })
-    let currentPatientName = document.getElementById("patient-current-patient")
-    currentPatientName.textContent = queue[0];
+    let currentPatientNameDoc = document.getElementById("doctors-current-patient");
+    let currentPatientName = document.getElementById("patient-current-patient");
+    if (patientData.find(patient => patient.name === inputVal)) {
+        document.getElementById("addPatient").value = '';
+        console.log("есть совпадение")
+        console.log(queue);
+    } else {
+        document.getElementById("addPatient").value = '';
+        queue.push(inputVal);
+        currentPatientNameDoc.textContent = queue[0];
+        currentPatientName.textContent = queue[0];
+        console.log(queue);
+        patientData.push({
+            name: inputVal,
+            resolution: "empty"
+        })
+    }
+
 }
 
 
 function nextPatient() {
     let currentPatientName = document.getElementById("doctors-current-patient")
-    if (queue.length === 0) {
+    let currentPatientNameForPatient = document.getElementById("patient-current-patient")
+    if (queue.length === 1) {
         currentPatientName.textContent = "Queue is empty";
+        currentPatientNameForPatient.textContent = "Queue is empty";
     } else {
-        currentPatientName.textContent = queue[0];
         queue.shift();
-        console.log(queue);
+        currentPatientName.textContent = queue[0];
+        currentPatientNameForPatient.textContent = queue[0];
+        console.log(queue.length, queue);
+
     }
 }
 
