@@ -1,0 +1,28 @@
+{
+  "name": "node.js-lab-project",
+  "version": "1.0.0",
+  "description": "Node.js% & Express based application for patient and doctor data management",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brownie77/Node.js-Lab-Project.git"
+  },
+  "author": "Kirill Podolinniy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Brownie77/Node.js-Lab-Project/issues"
+  },
+  "homepage": "https://github.com/Brownie77/Node.js-Lab-Project#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}

@@ -16,23 +16,32 @@ function checkLifetime() {
     return patientData;
 }
 
-function addNewPatient() {
+async function addNewPatient() {
     // checkLifetime();
     let addPatientInputValue = document.getElementById("addPatient").value;
     if (patientData.find(patient => patient.name === addPatientInputValue) || addPatientInputValue === '') {
         document.getElementById("addPatient").value = '';
         console.log(queue);
+        console.log(patientData)
     } else {
         document.getElementById("addPatient").value = '';
-        queue.push(addPatientInputValue);
-        currentPatientNameforDoctor.textContent = queue[0];
-        currentPatientNameforPatient.textContent = queue[0];
-        console.log(queue);
-        patientData.push({
-            name: addPatientInputValue,
-            resolution: "empty",
-            creationDate: new Date()
-        })
+        const data = {
+            "name": addPatientInputValue
+        };
+        try {
+            const response = await fetch('http://localhost:3000/api/patient', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            let newPatient = await response.json();
+            currentPatientNameforDoctor.textContent = newPatient;
+            currentPatientNameforPatient.textContent = newPatient;
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
     }
 
 }
