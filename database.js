@@ -43,11 +43,15 @@ class Database {
     }
 
      getCurrentInQueue() {
+         if(queue.length ===0){
+             return null;
+         }
         const currentInQueue = queue[0];
         return currentInQueue;
     }
 
     deleteResolution(index){
+        console.log(index)
         const deletedResolution = patientData[index].resolution;
         patientData[index].resolution = "";
         return deletedResolution;

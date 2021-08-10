@@ -5,14 +5,12 @@ const router = new Router();
 
 
 router.post('/patient', Controller.createPatient);
-router.get('/resolution', Controller.getResolution);
+router.post('/resolution/get', Controller.getResolution);
 router.get('/patient/next', [Controller.deleteFirstFromQueue, Controller.getCurrentInQueue]);
 router.post('/resolution', Controller.createResolution);
 router.get('/patient/all', Controller.getAllPatients);
 
-router.delete('/resolution', (req, res) => {
-    res.send('We delete resolution')
-});
+router.delete('/resolution/:key', Controller.deleteResolution);
 
 
 export default router;

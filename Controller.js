@@ -33,7 +33,7 @@ class Controller {
     }
 
     async deleteResolution(req, res) {
-        const deletedResolution = await Service.deleteResolution(req.body.name);
+        const deletedResolution = await Service.deleteResolution(req.params.key);
         res.json(deletedResolution);
 
     }
