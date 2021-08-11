@@ -37,6 +37,11 @@ class Controller {
         res.json(deletedResolution);
 
     }
+
+    async nextPatientInQueue(req, res, next) { 
+        await Service.deleteFirstFromQueue();
+        const currentInQueue = await Service.getCurrentInQueue();
+        res.json(currentInQueue);    }
 }
 
 
