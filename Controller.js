@@ -1,13 +1,28 @@
 import Service from './Service.js'
+import createPatientSchema from './schema/createPatientSchema.js'
+import createResolutionSchema from './schema/createResolutionSchema.js'
+import validate from './utilities/validate.js'
+
+
 class Controller {
     async createPatient(req, res) {
-       const newPatient = await Service.createPatient(req.body.name)
-       res.json(newPatient)
+        const valid = validate(req.body, createPatientSchema)
+        if (valid) {
+            const newPatient = await Service.createPatient(req.body.name)
+            res.json(newPatient);
+        } else {
+            res.status(400).send('Patient name must contain 2 or more characters')
+        }
     }
-
     async createResolution(req, res) {
-        const newResolution = await Service.createResolution(req.body.resolution);
-        res.json(newResolution);
+        const valid = validate(req.body, createResolutionSchema)
+        if (valid) {
+            const newResolution = await Service.createResolution(req.body.resolution);
+            res.json(newResolution);
+        } else {
+            res.status(400).send('The resolution must be at least 10 characters and no more than 400 characters.')
+
+        }
     }
 
     async getAllPatients(req, res) {
@@ -38,10 +53,11 @@ class Controller {
 
     }
 
-    async nextPatientInQueue(req, res, next) { 
+    async nextPatientInQueue(req, res, next) {
         await Service.deleteFirstFromQueue();
         const currentInQueue = await Service.getCurrentInQueue();
-        res.json(currentInQueue);    }
+        res.json(currentInQueue);
+    }
 }
 
 
