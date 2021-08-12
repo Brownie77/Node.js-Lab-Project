@@ -1,6 +1,6 @@
-import Service from './Service.js'
-import createPatientSchema from './schema/createPatientSchema.js'
-import validate from './utilities/validate.js'
+import Service from '../Service.js'
+import createPatientSchema from '../schema/createPatientSchema.js'
+import validate from '../utilities/validate.js'
 
 
 class PatientController {
@@ -13,7 +13,12 @@ class PatientController {
             res.status(400).send('Patient name must contain 2 or more characters')
         }
     }
+
+    async getAllPatients(req, res) {
+        const allPatients = await Service.getAllPatients();
+        res.json(allPatients);
+    }
 }
 
 
-export default new Controller();
+export default new PatientController();
