@@ -27,7 +27,8 @@ class Database {
     }
 
     createResolution(resolutionText) {
-        patientData[0].resolution = resolutionText;
+        const currentInQueue = this.searchPatientIndex(queue[0])
+        patientData[currentInQueue].resolution = resolutionText;
         return patientData[0].resolution;
     }
 

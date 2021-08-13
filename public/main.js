@@ -5,6 +5,27 @@ let patientData = [];
 let queue = [];
 //addNewPatient - добавить провеку на наличие имени в списке, если есть = добавить предуприждение 
 
+window.onload = async function () {
+    try {
+        const response = await fetch('http://localhost:3000/api/patient/current');
+        let currentPatient = await response.json();
+        if (currentPatient === null) {
+            if (window.location.pathname === '/doctor.html') {
+                currentPatientNameforDoctor.textContent = "Queue is empty";
+            } else {
+                currentPatientNameforPatient.textContent = "Queue is empty";
+            }
+        } else {
+            if (window.location.pathname === '/doctor.html') {
+                currentPatientNameforDoctor.textContent = currentPatient;
+            } else {
+                currentPatientNameforPatient.textContent = currentPatient;;
+            }
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
 
 function checkLifetime() {
     const lifetime = 10000;
@@ -34,8 +55,8 @@ async function addNewPatient() {
                 }
             });
             let newPatient = await response.json();
-            currentPatientNameforDoctor.textContent = newPatient;
             currentPatientNameforPatient.textContent = newPatient;
+            // currentPatientNameforDoctor.textContent = newPatient;
         } catch (error) {
             console.error('Ошибка:', error);
         }
@@ -55,7 +76,7 @@ async function nextPatient() {
             currentPatientNameforPatient.textContent = "Queue is empty";
         } else {
             currentPatientNameforDoctor.textContent = currentPatient;
-            currentPatientNameforPatient.textContent = currentPatient;
+            // currentPatientNameforPatient.textContent = currentPatient;
 
         }
     } catch (error) {
@@ -90,7 +111,7 @@ async function getResolutionForPatient() {
 
 
 
-async function setResolution() {    
+async function setResolution() {
     const data = {
         "resolution": document.getElementById("set-resolution").value,
     };

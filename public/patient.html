@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+    <div class="patient-view">
+        <div class="set-queue-wrapper">
+            <div class="current-patient">
+                <p class="definition">Current patient:</p>
+                <p id="patient-current-patient" class="output-info">Queue is empty</p>
+            </div>
+            <div class="add-patient-box">
+                <input type="text" placeholder="Input to add patient" id="addPatient">
+                <button class="bn1" type="button" onclick="addNewPatient();">Get Value</button>
+            </div>
+        </div>
+        <div class="search-resolution-wrapper">
+            <div class="search-patient-box">
+                <input id="resolution-search-input-patient" type="search">
+                <button class="bn1" type="button" onclick="getResolutionForPatient()">Search Resolution</button>
+            </div>
+            <div id="patient-resolution-info" class="resolution-info-box">
+            </div>
+        </div>
+    </div>
+<script src="main.js"></script>
+</div>
+</body>
+</html>

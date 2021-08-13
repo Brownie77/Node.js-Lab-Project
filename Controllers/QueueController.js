@@ -6,7 +6,7 @@ class QueueController {
     }
 
     async nextPatientInQueue(req, res, next) {
-        await Service.deleteFirstFromQueue();
+        await QueueService.deleteFirstFromQueue();
         const currentInQueue = await QueueService.getCurrentInQueue();
         res.json(currentInQueue);
     }
