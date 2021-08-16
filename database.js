@@ -37,7 +37,7 @@ class Database {
 
     }
 
-    deleteFirstFromQueue() {
+    getAndDeleteFirstFromQueue() {
         const currentPatient = queue[0];
         queue.shift();
         return currentPatient;

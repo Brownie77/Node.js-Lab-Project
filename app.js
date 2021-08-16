@@ -31,6 +31,9 @@ console.log(`Running on http://${HOST}:${PORT}`);
 // RedisDatabase.getQueue();
 // RedisDatabase.getAnddeleteFirstFromQueue();
 // RedisDatabase.getQueue();
-
 // RedisDatabase.createPatient('Vladimir');
-// RedisDatabase.getPatient('Vladimir');
+// RedisDatabase.createResolution('sadasdadadasda')
+
+
+
+
