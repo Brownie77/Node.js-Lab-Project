@@ -23,10 +23,14 @@ app.use(cors())
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
-RedisDatabase.addToQueue('Vanya');
-RedisDatabase.addToQueue('Vova');
-RedisDatabase.addToQueue('Sergey');
-RedisDatabase.addToQueue('Petr');
-RedisDatabase.getQueue();
-RedisDatabase.getAnddeleteFirstFromQueue();
-RedisDatabase.getQueue();
+// RedisDatabase.addToQueue('Vanya');
+// RedisDatabase.addToQueue('Vova');
+// RedisDatabase.addToQueue('Sergey');
+// RedisDatabase.addToQueue('Petr');
+// RedisDatabase.getCurrentInQueue();
+// RedisDatabase.getQueue();
+// RedisDatabase.getAnddeleteFirstFromQueue();
+// RedisDatabase.getQueue();
+
+// RedisDatabase.createPatient('Vladimir');
+// RedisDatabase.getPatient('Vladimir');
