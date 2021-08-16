@@ -55,7 +55,7 @@ async function addNewPatient() {
                 }
             });
             let newPatient = await response.json();
-            currentPatientNameforPatient.textContent = newPatient;
+            currentPatientNameforPatient.textContent = newPatient.name;
             // currentPatientNameforDoctor.textContent = newPatient;
         } catch (error) {
             console.error('Ошибка:', error);
