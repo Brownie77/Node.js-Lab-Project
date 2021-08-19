@@ -1,5 +1,4 @@
-import Database from '../database.js'
-import RedisDatabase from '../redisdb.js'
+import Database from '../dbDriver.js';
 class QueueService {
 
     async deleteFirstFromQueue() {
@@ -13,10 +12,8 @@ class QueueService {
     }
 
     async nextPatientInQueue() {
-        // await Database.getAndDeleteFirstFromQueue();
-        // const isNextPatient =  await Database.getCurrentInQueue();
-        await RedisDatabase.getAndDeleteFirstFromQueue();
-        const isNextPatient =  await RedisDatabase.getCurrentInQueue();
+        await Database.getAndDeleteFirstFromQueue();
+        const isNextPatient =  await Database.getCurrentInQueue();
         return isNextPatient;
     }
 }

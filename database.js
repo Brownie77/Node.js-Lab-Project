@@ -1,39 +1,27 @@
 let queue = [];
-let patientData = [];
+let patientData = {};
 
-class Database {
+export default class  {
     createPatient(patientId) {
         queue.push(patientId);
-        patientData.push({
-            name: patientId,
+        patientData[`${patientId}`] = { name: patientId,
             resolution: "Current version of resolution is empty",
-            creationDate: new Date()
-        })
+            creationDate: new Date()}
         return this.getCurrentInQueue();
     }
 
     getAllPatients(){
-        return patientData;
-    }
-
-    searchPatientIndex(name) {
-        for (let i = 0; i < patientData.length; i++) {
-            if (patientData[i].name === name) {
-                return i;
-            } 
-        }
-        return -1;
-
+        return Object.values(patientData);
     }
 
     createResolution(resolutionText) {
-        const currentInQueue = this.searchPatientIndex(queue[0])
+        const currentInQueue = queue[0]
         patientData[currentInQueue].resolution = resolutionText;
-        return patientData[0].resolution;
+        return patientData[currentInQueue].resolution
     }
 
-     getResolution(index) {
-        return patientData[index].resolution;
+     getResolution(patientId) {
+        return patientData[patientId].resolution;
 
     }
 
@@ -51,13 +39,11 @@ class Database {
         return currentInQueue;
     }
 
-    deleteResolution(index){
-        console.log(index)
-        const deletedResolution = patientData[index].resolution;
-        patientData[index].resolution = "";
+    deleteResolution(patientId){
+        const deletedResolution = patientData[patientId].resolution;
+        patientData[patientId].resolution = "";
         return deletedResolution;
     }
 }
 
 
-export default new Database();
