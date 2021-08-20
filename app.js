@@ -14,7 +14,6 @@ app.use(express.static('public'));
 app.use(cors())
 app.listen(config.app.PORT, config.app.HOST);
 console.log(`Running on http://${config.app.HOST}:${config.app.PORT}, DATABASE: ${config.database.TYPE}`);
-
 // RedisDatabase.getPatient('Vanya');
 // RedisDatabase.getAllPatients();
 // RedisDatabase.getCurrentInQueue();

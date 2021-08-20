@@ -47,7 +47,7 @@ async function addNewPatient() {
             "name": addPatientInputValue
         };
         try {
-            const response = await fetch('http://localhost:3000/api/patient', {
+            const response = await fetch(`http://localhost:3000/api/patient`, {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: {
@@ -113,11 +113,12 @@ async function getResolutionForPatient() {
 
 
 async function setResolution() {
+    let addExpireInputValue = document.getElementById("expireInput").value;
     const data = {
         "resolution": document.getElementById("set-resolution").value,
     };
     try {
-        const response = await fetch('http://localhost:3000/api/resolution/', {
+        const response = await fetch(`http://localhost:3000/api/resolution?expire=${addExpireInputValue}`, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {

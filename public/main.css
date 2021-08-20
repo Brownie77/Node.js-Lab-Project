@@ -135,4 +135,17 @@ input {
 
 
 .add-resolution-btn {
+    margin-left: 10px;
+}
+
+.set-resolution-panel{
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+#expireInput {
+    align-self: flex-end;
+    margin-left: 10px;
 }

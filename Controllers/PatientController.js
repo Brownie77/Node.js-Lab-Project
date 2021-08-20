@@ -7,6 +7,7 @@ class PatientController {
     async createPatient(req, res) {
         const valid = validate(req.body, createPatientSchema)
         if (valid) {
+            console.log("its work")
             const newPatient = await PatientService.createPatient(req.body.name)
             res.json(newPatient);
         } else {

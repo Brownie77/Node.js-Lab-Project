@@ -9,6 +9,7 @@ const scanner = new redisScan(db);
 const hgetAllAsync = promisify(db.HGETALL).bind(db);
 const hmsetAsync = promisify(db.HMSET).bind(db);
 const hgetAsync = promisify(db.HGET).bind(db);
+const hdelAsync = promisify(db.hdel).bind(db);
 const lrangeAsync = promisify(db.lrange).bind(db);
 db.on("error", function (error) {
     console.error(error);
@@ -16,7 +17,17 @@ db.on("error", function (error) {
 db.FLUSHALL();
 // console.log(process.env.NODE_ENV)
 
-export default class  {
+export default class {
+
+    async checkExpires(patientId) {
+        db.hgetall(patientId, function (err, reply) {
+            if (parseInt(reply.resolutionLifetime) <= Date.now()) {
+                hdelAsync(patientId, 'resolution');
+            }
+        });
+        const searchedPatient = await hgetAllAsync(patientId);
+        return searchedPatient;
+    }
     async getAndDeleteFirstFromQueue() {
         db.lpop('queue', function (err, reply) {
             console.log(err, reply)
@@ -42,7 +53,9 @@ export default class  {
         hmsetAsync(patientId, {
             'name': patientId,
             'resolution': 'Current version of resolution is empty',
-            'creationDate': new Date()
+            'creationDate': new Date(),
+            'resolutionLifetime': 0,
+
         });
         await this.addToQueue(patientId);
         const newPatient = await hgetAllAsync(patientId);
@@ -63,15 +76,21 @@ export default class  {
     }
 
     async getResolution(patientId) {
+        const checkedPatient = await this.checkExpires(patientId);
         const currentPatient = await this.getPatient(patientId);
-        return currentPatient.resolution;
+        if(currentPatient.resolution) {
+            return currentPatient.resolution;
+        }
+        return null;
     }
 
-    async createResolution(resolutionText) {
+    async createResolution(resolutionText, lifetime) {
+        console.log(typeof lifetime)
+        const expireTime = (lifetime * 1000) + Date.now()
         const currentPatientInQueue = await this.getCurrentInQueue();
         const patientInfoFromDatabase = await this.getPatient(currentPatientInQueue);
-        console.log(patientInfoFromDatabase)
         patientInfoFromDatabase.resolution = resolutionText;
+        patientInfoFromDatabase.resolutionLifetime = expireTime;
         hmsetAsync(currentPatientInQueue, patientInfoFromDatabase);
         return patientInfoFromDatabase.resolution
     }
