@@ -4,12 +4,11 @@ import validate from '../utilities/validate.js'
 
 
 class PatientController {
-    async createPatient(req, res) {
+    async   createPatientAndReturnCurrentPatient(req, res) {
         const valid = validate(req.body, createPatientSchema)
         if (valid) {
-            console.log("its work")
-            const newPatient = await PatientService.createPatient(req.body.name)
-            res.json(newPatient);
+            const currentPatientInQueue = await PatientService.createPatientAndReturnCurrentPatient(req.body.name)
+            res.json(currentPatientInQueue);
         } else {
             res.status(400).send('Patient name must contain 2 or more characters')
         }

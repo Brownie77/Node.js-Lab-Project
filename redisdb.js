@@ -1,6 +1,6 @@
 import redis from 'redis';
 import redisScan from 'node-redis-scan';
-
+import Api404Error from './errors/api404Error.js';
 import {
     promisify
 } from 'util';
@@ -21,12 +21,15 @@ export default class {
 
     async checkExpires(patientId) {
         db.hgetall(patientId, function (err, reply) {
+            if (reply === null) {
+                return null;
+            }
             if (parseInt(reply.resolutionLifetime) <= Date.now()) {
                 hdelAsync(patientId, 'resolution');
             }
         });
-        const searchedPatient = await hgetAllAsync(patientId);
-        return searchedPatient;
+        // const searchedPatient = await hgetAllAsync(patientId);
+        // return searchedPatient;
     }
     async getAndDeleteFirstFromQueue() {
         db.lpop('queue', function (err, reply) {
@@ -59,6 +62,18 @@ export default class {
         });
         await this.addToQueue(patientId);
         const newPatient = await hgetAllAsync(patientId);
+        return newPatient;
+    }
+    async createPatientAndReturnCurrentPatient(patientId) {
+        hmsetAsync(patientId, {
+            'name': patientId,
+            'resolution': 'Current version of resolution is empty',
+            'creationDate': new Date(),
+            'resolutionLifetime': 0,
+
+        });
+        await this.addToQueue(patientId);
+        const newPatient = await hgetAllAsync(patientId);
         const currentPatient = await this.getCurrentInQueue();
         return currentPatient;
     }
@@ -76,13 +91,19 @@ export default class {
     }
 
     async getResolution(patientId) {
-        const checkedPatient = await this.checkExpires(patientId);
-        const currentPatient = await this.getPatient(patientId);
-        if(currentPatient.resolution) {
-            return currentPatient.resolution;
+            await this.checkExpires(patientId);
+            const searchedPatient = await this.getPatient(patientId);
+            if(searchedPatient === null) {
+                throw new Api404Error(`Patient with id: ${patientId} not found.`);
+            }
+            console.log(searchedPatient)
+            if (searchedPatient && searchedPatient.resolution) {
+                return searchedPatient.resolution;
+            }
+            return null;
         }
-        return null;
-    }
+
+
 
     async createResolution(resolutionText, lifetime) {
         console.log(typeof lifetime)

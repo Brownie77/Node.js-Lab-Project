@@ -2,13 +2,22 @@ let queue = [];
 let patientData = {};
 
 export default class  {
-    createPatient(patientId) {
+    createPatientAndReturnCurrentPatient(patientId) {
         queue.push(patientId);
         patientData[`${patientId}`] = { name: patientId,
             resolution: "Current version of resolution is empty",
             creationDate: new Date()}
         return this.getCurrentInQueue();
     }
+
+    createPatient(patientId) {
+        queue.push(patientId);
+        patientData[`${patientId}`] = { name: patientId,
+            resolution: "Current version of resolution is empty",
+            creationDate: new Date()}
+        return patientData[`${patientId}`];
+    }
+
 
     getAllPatients(){
         return Object.values(patientData);
