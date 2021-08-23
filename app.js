@@ -3,13 +3,12 @@ import router from './router.js';
 import cors from 'cors';
 import config from './config.js';
 import errorHandler from "./errors/errorHandler.js";
-import SQLServer from './sqlDB/connect.js'
+import sqlDB from './sqlDB/sequelize.js'
 const app = express();
-const sqlDB = new SQLServer("localhost", "root", "medstage", "KevalaKumar1995");
-sqlDB.createPatientsTable()
-sqlDB.createQueueTable();
-// sqlDB.addPatient();
-
+const sqlDatabase = new sqlDB();
+sqlDatabase.authenticationDB();
+sqlDatabase.createPatient('Vova')
+sqlDatabase.addToQueue('Ivan')
 
 app.use(express.json());
 app.use('/api', router);
