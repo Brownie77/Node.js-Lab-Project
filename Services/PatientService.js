@@ -1,12 +1,10 @@
 import dbDriver from '../dbDriver.js';
-class PatientService {
+export default class PatientService {
     constructor(database) {
         this.database = database;
     }
     async createPatientAndReturnCurrentPatient(name) {
        const returnedPatient = await this.database.createPatientAndReturnCurrentPatient(name);
-       console.log(`Now the returned patient is ${returnedPatient}`)
-
         return returnedPatient;
     }
 
@@ -16,7 +14,10 @@ class PatientService {
         return allPatients;
 
     }
+
+    async clearDatabase() {
+        await this.database.clearDatabase();
+    }
 }
 
 
-export default new PatientService(dbDriver);

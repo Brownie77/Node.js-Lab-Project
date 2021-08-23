@@ -11,6 +11,7 @@ const hmsetAsync = promisify(db.HMSET).bind(db);
 const hgetAsync = promisify(db.HGET).bind(db);
 const hdelAsync = promisify(db.hdel).bind(db);
 const lrangeAsync = promisify(db.lrange).bind(db);
+const lpopAsync = promisify(db.lpop).bind(db)
 db.on("error", function (error) {
     console.error(error);
 });
@@ -18,6 +19,10 @@ db.FLUSHALL();
 // console.log(process.env.NODE_ENV)
 
 export default class {
+
+    async clearDatabase() {
+        db.FLUSHALL();
+    }
 
     async checkExpires(patientId) {
         db.hgetall(patientId, function (err, reply) {
@@ -32,16 +37,14 @@ export default class {
         // return searchedPatient;
     }
     async getAndDeleteFirstFromQueue() {
-        db.lpop('queue', function (err, reply) {
-            console.log(err, reply)
-        });
+        const deletedFirst = await lpopAsync('queue');
+        return deletedFirst;
     }
     async addToQueue(patientId) {
         db.rpush('queue', patientId);
     }
     async getQueue() {
         const queue = await lrangeAsync('queue', 0, -1);
-        console.log(queue)
         return queue;
     }
 
@@ -82,12 +85,14 @@ export default class {
         return searchedPatient;
     }
     async getAllPatients() {
+        let patients = [];
         scanner.scan('*', {
             type: "hash"
         }, (err, matchingKeys) => {
             if (err) throw (err);
-            console.log(matchingKeys)
-        })
+            patients =  matchingKeys;})
+        return patients;
+
     }
 
     async getResolution(patientId) {
