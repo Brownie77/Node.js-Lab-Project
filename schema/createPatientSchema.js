@@ -9,4 +9,5 @@ export default {
     required: ["name"],
     additionalProperties: false
   }
+
   
