@@ -6,3 +6,4 @@ const httpStatusCodes = {
    }
    
    export default httpStatusCodes
+   
