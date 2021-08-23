@@ -72,7 +72,7 @@ input {
 
 
 .set-resolution-wrapper {
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     flex-direction: column;
     display: flex;
@@ -133,4 +133,19 @@ input {
 	top:1px;
 }
 
-        
+
+.add-resolution-btn {
+    margin-left: 10px;
+}
+
+.set-resolution-panel{
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+#expireInput {
+    align-self: flex-end;
+    margin-left: 10px;
+}
