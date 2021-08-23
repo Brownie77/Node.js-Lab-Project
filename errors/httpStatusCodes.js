@@ -5,5 +5,3 @@ const httpStatusCodes = {
     INTERNAL_SERVER: 500
    }
    export default httpStatusCodes
-
-   
