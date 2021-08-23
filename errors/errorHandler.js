@@ -26,5 +26,3 @@ function logError (err) {
     returnError,
     isOperationalError
    }
-
-   
