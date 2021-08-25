@@ -7,8 +7,10 @@ import sqlDB from './sqlDB/sequelize.js'
 const app = express();
 const sqlDatabase = new sqlDB();
 sqlDatabase.authenticationDB();
-sqlDatabase.createPatient('Vova')
-sqlDatabase.addToQueue('Ivan')
+sqlDatabase.createQueueTable();
+sqlDatabase.createPatientAndReturnCurrentPatient('Vova')
+sqlDatabase.getCountOfQueue()
+
 
 app.use(express.json());
 app.use('/api', router);
