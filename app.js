@@ -6,10 +6,15 @@ import errorHandler from "./errors/errorHandler.js";
 import sqlDB from './sqlDB/sequelize.js'
 const app = express();
 const sqlDatabase = new sqlDB();
-sqlDatabase.authenticationDB();
-sqlDatabase.createQueueTable();
-sqlDatabase.createPatientAndReturnCurrentPatient('Vova')
-sqlDatabase.getCountOfQueue()
+await sqlDatabase.authenticationDB();
+await sqlDatabase.createQueueTable();
+await sqlDatabase.createResolutionTable();
+await sqlDatabase.createPatientAndReturnCurrentPatient('Sergey')
+await sqlDatabase.createResolution("asdasdasasdada", 10)
+await sqlDatabase.getResolution('Sergey');
+await sqlDatabase.deleteResolution('Sergey');
+// sqlDatabase.getAndDeleteFirstFromQueue();
+// sqlDatabase.getCurrentInQueue();
 
 
 app.use(express.json());
