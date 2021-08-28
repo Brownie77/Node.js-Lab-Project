@@ -4,7 +4,8 @@ const env = process.env.NODE_ENV;
 const dbtype = process.env.NODE_DB;
 const urlDB = {
     redisDB: '../redisdb.js',
-    inMemoryDB: '../database.js'
+    inMemoryDB: '../database.js',
+    sqlDB: './sqlDB/.js'
 }
 const dev = {
     app: {

@@ -1,12 +1,15 @@
 import RedisDB from "./redisdb.js";
 import inMemoryDB from "./database.js";
+import sqlDB from './sqlDB/sequelize.js'
 import config from "./config.js";
 const appDB = (typeOfStorage) => {
-    if(typeOfStorage ==='redisDB') {
-        return new RedisDB()
-    } else if(typeOfStorage ==='inMemoryDB') {
-        return new inMemoryDB()
-
+    switch (typeOfStorage) {
+        case 'redisDB':
+            return new RedisDB();
+        case 'inMemoryDB':
+            return new inMemoryDB();
+        case 'sqlDB':
+            return new sqlDB();
     }
 }
 

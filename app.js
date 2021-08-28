@@ -6,13 +6,14 @@ import errorHandler from "./errors/errorHandler.js";
 import sqlDB from './sqlDB/sequelize.js'
 const app = express();
 const sqlDatabase = new sqlDB();
-await sqlDatabase.authenticationDB();
-await sqlDatabase.createQueueTable();
-await sqlDatabase.createResolutionTable();
-await sqlDatabase.createPatientAndReturnCurrentPatient('Sergey')
-await sqlDatabase.createResolution("asdasdasasdada", 10)
-await sqlDatabase.getResolution('Sergey');
-await sqlDatabase.deleteResolution('Sergey');
+// console.log(Date.parse(sqlDatabase.sqlDateConvertor('2021-08-27 13:30:49')))
+// await sqlDatabase.authenticationDB();
+// await sqlDatabase.createQueueTable();
+// await sqlDatabase.createResolutionTable();
+// await sqlDatabase.createPatientAndReturnCurrentPatient('Sergey')
+// await sqlDatabase.createResolution("asdasdasasdada", 10)
+// await sqlDatabase.getResolution('Sergey');
+// await sqlDatabase.deleteResolution('Sergey');
 // sqlDatabase.getAndDeleteFirstFromQueue();
 // sqlDatabase.getCurrentInQueue();
 

@@ -1,5 +1,7 @@
 import sqlz from 'sequelize';
 import crypto from 'crypto';
+import Api404Error from '../errors/api404Error.js';
+
 const {
     Sequelize,
     DataTypes
@@ -9,112 +11,93 @@ const sequelize = new Sequelize("medstage", "root", "KevalaKumar1995", {
     dialect: "mysql",
     host: "localhost"
 });
-await sequelize.sync({force: true});
+try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+    await sequelize.sync({
+        force: true
+    })
+} catch (error) {
+    console.error('Unable to connect to the database:', error);
+}
 
 export default class {
-    async authenticationDB() {
-        try {
-            await sequelize.authenticate();
-            console.log('Connection has been established successfully.');
-        } catch (error) {
-            console.error('Unable to connect to the database:', error);
-        }
-    }
-
-    async createPatientsTable() {
-        const Patient = sequelize.define(
-            'Patient', {
-                id: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                    primaryKey: true,
-                },
-                name: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
+    patient = sequelize.define(
+        'Patient', {
+            id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                primaryKey: true,
+            },
+            name: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            }
+        });
+    queue = sequelize.define(
+        'Queue', {
+            id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                primaryKey: true,
+            },
+            patient_id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                references: {
+                    model: this.patient,
+                    key: 'id',
                 }
-            });
-            await Patient.sync();
-        // (async () => {
-        //     await sequelize.sync()
-        // })()
-        return Patient;
-    }
-
-    async createQueueTable(){
-        const Patient = await this.createPatientsTable()
-        const QueueModel = sequelize.define(
-            'Queue', {
-                id: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                    primaryKey: true,
-                },
-                patient_id: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                    references: {
-                        model: Patient,
-                        key: 'id',
-                    }
+            }
+        });
+    resolution = sequelize.define(
+        'Resolution', {
+            id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                primaryKey: true,
+            },
+            patient_id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                references: {
+                    model: this.patient,
+                    key: 'id',
                 }
-            });
-          await QueueModel.sync();  
-        // (async () => {
-        //     await sequelize.sync()
-        // })()
-        return QueueModel
-    }
+            },
+            value: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            expire_time: {
+                type: DataTypes.INTEGER,
+                defaultValue: null
 
-    async createResolutionTable() {
-        const Patient = await this.createPatientsTable()
-        const ResolutionModel = sequelize.define(
-            'Resolution', {
-                id: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                    primaryKey: true,
-                },
-                patient_id: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                    references: {
-                        model: Patient,
-                        key: 'id',
-                    }
-                },
-                value: {
-                    type: DataTypes.TEXT,
-                    allowNull: false,
-                },
-                expire_time: {
-                    type: DataTypes.INTEGER,
-                    defaultValue: null
-
-                }
-            });
-          await ResolutionModel.sync();
-          return ResolutionModel;
+            }
+        });
+    async expireTimeIsOut(createdAt, expireTime) {
+        Date.parse(createdAt.toISOString())
+        const creationDateInMilliseconds = Date.parse(createdAt.toISOString())
+        return creationDateInMilliseconds + (expireTime * 1000) > Date.now() ? false : true
     }
     async createPatientAndReturnCurrentPatient(name) {
-        const patientModel = await this.createPatientsTable();
+        await this.patient.sync()
         const patient_id = crypto.randomUUID({
             disableEntropyCache: true
         });
-        await patientModel.create({
+        await this.patient.create({
             id: patient_id,
             name
         })
-        this.addToQueue(patient_id); 
+        await this.addToQueue(patient_id);
         const currentPatientInQueue = await this.getCurrentInQueue();
         return currentPatientInQueue;
     }
     async createPatient(name) {
-        const patientModel = await this.createPatientsTable();
         const patient_id = crypto.randomUUID({
             disableEntropyCache: true
         });
-        await patientModel.create({
+        await this.Patient.create({
             id: patient_id,
             name
         })
@@ -122,47 +105,62 @@ export default class {
     }
 
     async addToQueue(patient_id) {
-        const queueModel = await this.createQueueTable(); 
+        await this.queue.sync()
         const uuid = crypto.randomUUID({
             disableEntropyCache: true
         });
-        const currentPatientInQueue = await queueModel.create({
+        const currentPatientInQueue = await this.queue.create({
             id: uuid,
             patient_id
         })
+        console.log(`CURRENT PATIENT IN QUEUE: ${currentPatientInQueue}`)
         return currentPatientInQueue
     }
 
     async getCurrentInQueue() {
         const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
-        return patientInfo[0].name
+        if (patientInfo === null) {
+            return null;
         }
+        return patientInfo[0].name
+    }
 
-    async getAllInfoOfCurrentPatientInQueue(){
-        const queueModel = await this.createQueueTable();
-        const patientModel = await this.createPatientsTable();
-        const currentPatientInQueue = await queueModel.findAll({limit: 1, raw: true, order: [['createdAt', 'ASC']]});
-        const patient = await patientModel.findAll({
+    async getAllInfoOfCurrentPatientInQueue() {
+        await this.queue.sync()
+        const currentPatientInQueue = await this.queue.findAll({
+            limit: 1,
+            raw: true,
+            order: [
+                ['createdAt', 'ASC']
+            ]
+        });
+        if (currentPatientInQueue.length === 0) {
+            return null;
+        }
+        const patient = await this.patient.findAll({
             raw: true,
             where: {
-              id: currentPatientInQueue[0].patient_id
+                id: currentPatientInQueue[0].patient_id
             }
-          });
-          return patient
-        }
+        });
+        return patient
+    }
 
 
     async getCountOfQueue() {
-        const queueModel = await this.createQueueTable();
-        const amountPatientsInQueue = await queueModel.count();
+        await this.queue.sync()
+        const amountPatientsInQueue = await this.queue.count();
         return amountPatientsInQueue;
     }
 
 
-    async getAndDeleteFirstFromQueue(){
-        const queueModel = await this.createQueueTable();
+    async getAndDeleteFirstFromQueue() {
+        await this.queue.sync()
         const patient = await this.getAllInfoOfCurrentPatientInQueue()
-        const deletedPatient = await queueModel.destroy({
+        if (patient === undefined) {
+            throw new Api404Error(`Patient with id: ${patient[0].id} not found.`);
+        }
+        const deletedPatient = await this.queue.destroy({
             where: {
                 patient_id: patient[0].id
             }
@@ -171,12 +169,12 @@ export default class {
     }
 
     async createResolution(resolutionText, lifetime) {
-        const resolutionModel = await this.createResolutionTable();
+        await this.resolution.sync();
         const uuid = crypto.randomUUID({
             disableEntropyCache: true
         });
         const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
-        const newResolution = await resolutionModel.create({
+        const newResolution = await this.resolution.create({
             id: uuid,
             patient_id: patientInfo[0].id,
             value: resolutionText,
@@ -185,54 +183,74 @@ export default class {
     }
 
     async getResolution(name) {
-        const patientModel = await this.createPatientsTable();
-        const resolutionModel = await this.createResolutionTable();
-        const patient = await patientModel.findAll({
+        await this.resolution.sync();
+        const patient = await this.patient.findAll({
             limit: 10,
             raw: true,
             where: {
-              name: name
+                name: name
             },
-            order: [['createdAt', 'ASC']]
-          });
-          console.log(`PATIENT IS`,patient)
-            const searchedResolution = await resolutionModel.findAll({
+            order: [
+                ['createdAt', 'ASC']
+            ]
+        });
+        if (patient.length === 0) {
+            throw new Api404Error(`The user named ${name} was not found`);
+        }
+        const searchedResolution = await this.resolution.findAll({
             raw: true,
             where: {
-              patient_id: patient[0].id
+                patient_id: patient[0].id
             },
-            order: [['createdAt', 'ASC']]
+            order: [
+                ['createdAt', 'ASC']
+            ]
 
         })
+
+        if (searchedResolution.length === 0) {
+            throw new Api404Error(`This patient has no resolutions yet or resolution was deleted`);
+        }
+        if (await this.expireTimeIsOut(searchedResolution[0].createdAt, searchedResolution[0].expire_time)) {
+            await this.resolution.destroy({
+                where: {
+                    patient_id: patient[0].id
+                }
+            });
+        }
         return searchedResolution[0].value
     }
 
-    async deleteResolution(name) { 
-        const patientModel = await this.createPatientsTable();
-        const resolutionModel = await this.createResolutionTable();
-        const patient = await patientModel.findAll({
+    async deleteResolution(name) {
+        await this.resolution.sync();
+        const patient = await this.patient.findAll({
             limit: 1,
             raw: true,
             where: {
-              name: name
+                name: name
             },
-            order: [['createdAt', 'ASC']]
-          });
-        const searchedResolution = await resolutionModel.findAll({
+            order: [
+                ['createdAt', 'ASC']
+            ]
+        });
+        const searchedResolution = await this.resolution.findAll({
             limit: 1,
             raw: true,
             where: {
-              patient_id: patient[0].id
+                patient_id: patient[0].id
             },
-            order: [['createdAt', 'ASC']]
+            order: [
+                ['createdAt', 'ASC']
+            ]
         })
-        await resolutionModel.update({
-            value: ""
-          },
-          {
-            where: { patient_id: patient[0].id}
-          }
-        );
-        return searchedResolution;
+        if (searchedResolution.length === 0) {
+            throw new Api404Error(`This patient has no resolutions`);
+        }
+        await this.resolution.destroy({
+            where: {
+                patient_id: patient[0].id
+            }
+        });
+        return searchedResolution[0].value;
     }
 }

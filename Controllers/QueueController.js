@@ -6,8 +6,13 @@ class QueueController {
     }
 
     async nextPatientInQueue(req, res, next) {
-        const nextPatient = await QueueService.nextPatientInQueue();
-        res.json(nextPatient);
+        try {
+            const nextPatient = await QueueService.nextPatientInQueue();
+            res.json(nextPatient);
+        } catch (err) {
+            next(err);
+        }
+        
     }
 }
 

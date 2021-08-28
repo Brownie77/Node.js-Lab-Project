@@ -24,9 +24,13 @@ class ResolutionController {
             next(error)
         }
     }
-    async deleteResolution(req, res) {
-        const deletedResolution = await ResolutionService.deleteResolution(req.params.key);
-        res.json(deletedResolution);
+    async deleteResolution(req, res, next) {
+        try {
+            const deletedResolution = await ResolutionService.deleteResolution(req.params.key);
+            res.json(deletedResolution);
+        } catch(error) {
+            next(error);
+        }
 
     }
 }

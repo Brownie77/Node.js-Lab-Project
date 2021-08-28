@@ -123,8 +123,7 @@ export default class {
     async deleteResolution(patientId) {
         const patientInfoFromDatabase = await this.getPatient(patientId);
         const previousResolution = patientInfoFromDatabase.resolution
-        patientInfoFromDatabase.resolution = "";
-        hmsetAsync(patientId, patientInfoFromDatabase);
+        await hdelAsync(patientId, 'resolution');
         return previousResolution;
     }
 

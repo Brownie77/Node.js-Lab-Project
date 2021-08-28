@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "export NODE_DB=redisDB && export NODE_ENV=dev && nodemon app.js",
+    "dev": "export NODE_DB=sqlDB && export NODE_ENV=dev && nodemon app.js",
     "test": "export NODE_DB=redisDB && export NODE_ENV=test && jest"
   },
   "repository": {
