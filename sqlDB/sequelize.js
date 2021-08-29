@@ -9,14 +9,16 @@ const {
 
 const sequelize = new Sequelize("medstage", "root", "KevalaKumar1995", {
     dialect: "mysql",
-    host: "localhost"
+    host: "localhost",
+    logging: false
+
 });
 try {
-    await sequelize.authenticate();
+     sequelize.authenticate();
     console.log('Connection has been established successfully.');
-    await sequelize.sync({
-        force: true
-    })
+    (async() => {
+        await sequelize.sync()
+    })()
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }
@@ -75,6 +77,15 @@ export default class {
 
             }
         });
+    async clearDatabase() {
+
+        await this.queue.destroy({ truncate: { cascade: true } });
+
+        await this.resolution.destroy({ truncate: { cascade: true } });
+
+        await this.patient.destroy({ truncate: { cascade: true } });
+
+    }
     async expireTimeIsOut(createdAt, expireTime) {
         Date.parse(createdAt.toISOString())
         const creationDateInMilliseconds = Date.parse(createdAt.toISOString())
@@ -90,6 +101,7 @@ export default class {
             name
         })
         await this.addToQueue(patient_id);
+        console.log(await this.getCountOfQueue())
         const currentPatientInQueue = await this.getCurrentInQueue();
         return currentPatientInQueue;
     }
@@ -113,7 +125,6 @@ export default class {
             id: uuid,
             patient_id
         })
-        console.log(`CURRENT PATIENT IN QUEUE: ${currentPatientInQueue}`)
         return currentPatientInQueue
     }
 
@@ -165,6 +176,7 @@ export default class {
                 patient_id: patient[0].id
             }
         })
+        console.log(deletedPatient)
         return deletedPatient;
     }
 

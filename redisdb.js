@@ -101,17 +101,15 @@ export default class {
             if(searchedPatient === null) {
                 throw new Api404Error(`Patient with id: ${patientId} not found.`);
             }
-            console.log(searchedPatient)
-            if (searchedPatient && searchedPatient.resolution) {
-                return searchedPatient.resolution;
+            if(searchedPatient.resolution === undefined) {
+                throw new Api404Error(`This patient has no resolutions yet or resolution was deleted`);
             }
-            return null;
+            return searchedPatient.resolution;
         }
 
 
 
     async createResolution(resolutionText, lifetime) {
-        console.log(typeof lifetime)
         const expireTime = (lifetime * 1000) + Date.now()
         const currentPatientInQueue = await this.getCurrentInQueue();
         const patientInfoFromDatabase = await this.getPatient(currentPatientInQueue);

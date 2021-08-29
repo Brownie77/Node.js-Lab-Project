@@ -27,17 +27,7 @@ window.onload = async function () {
     }
 }
 
-function checkLifetime() {
-    const lifetime = 10000;
-    let currentTime = new Date();
-    patientData = patientData.filter(patient => Date.parse(currentTime) - Date.parse(patient.creationDate) < lifetime);
-    queue = [];
-    patientData.forEach(patient => queue.push(patient.name));
-    return patientData;
-}
-
 async function addNewPatient() {
-    // checkLifetime();
     let addPatientInputValue = document.getElementById("addPatient").value;
     if (patientData.find(patient => patient.name === addPatientInputValue) || addPatientInputValue === '') {
         document.getElementById("addPatient").value = '';
