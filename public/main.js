@@ -94,9 +94,8 @@ async function getResolutionForPatient() {
         });
         let searchedResolution = await response.json();
         resolutionWrap.insertAdjacentHTML('beforeend', `<p id='resolutionForPatient'>${searchedResolution}</p`);
-
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error(error)
     }
 }
 

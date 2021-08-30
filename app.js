@@ -14,6 +14,7 @@ app.use(express.json());
 app.use('/api', router);
 app.use(express.static('public'));
 app.use(cors())
+
 app.listen(config.app.PORT, config.app.HOST);
 process.on('unhandledRejection', error => {
     throw error

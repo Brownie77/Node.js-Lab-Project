@@ -15,7 +15,7 @@ Install the dependencies and devDependencies and start the server.
 ```sh
 cd Node.js-Lab-Project
 npm install
-npm start
+npm run dev
 ```
 ## Test
 
