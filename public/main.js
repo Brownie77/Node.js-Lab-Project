@@ -33,8 +33,10 @@ async function addNewPatient() {
         document.getElementById("addPatient").value = '';
     } else {
         document.getElementById("addPatient").value = '';
+        const user_id = window.location.search.substring(1)
         const data = {
-            "name": addPatientInputValue
+            "name": addPatientInputValue,
+            "user_id": user_id
         };
         try {
             const response = await fetch(`http://localhost:3000/api/patient`, {
@@ -44,6 +46,11 @@ async function addNewPatient() {
                     'Content-Type': 'application/json',
                 }
             });
+            console.log(response.status)
+            if(response.status === 401) {
+                window.location.replace("http://localhost:3000/static/login.html");
+
+            }
             let newPatient = await response.json();
             console.log(newPatient)
             currentPatientNameforPatient.textContent = newPatient;
@@ -78,7 +85,8 @@ async function nextPatient() {
 async function getResolutionForPatient() {
     let resolutionText = document.getElementById("resolutionForPatient");
     let searchResolutionInputValue = document.getElementById("resolution-search-input-patient").value;
-    let resolutionWrap = document.getElementById("patient-resolution-info");
+    let resolutionWrap = document.getElementById("resolution-info-output");
+    console.log(resolutionWrap)
     document.getElementById("resolution-search-input-patient").value = '';
     if (resolutionText !== null) resolutionText.remove();
     const data = {
@@ -93,12 +101,11 @@ async function getResolutionForPatient() {
             }
         });
         let searchedResolution = await response.json();
-        resolutionWrap.insertAdjacentHTML('beforeend', `<p id='resolutionForPatient'>${searchedResolution}</p`);
+        resolutionWrap.insertAdjacentHTML('afterbegin', `<p id='resolutionForPatient'>${searchedResolution}</p`);
     } catch (error) {
         console.error(error)
     }
 }
-
 
 
 async function setResolution() {
