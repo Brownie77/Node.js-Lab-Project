@@ -1,7 +1,8 @@
 import PatientService from '../Services/PatientService.js'
 import QueueService from '../Services/QueueService.js'
 import ResolutionService from '../Services/ResolutionService.js'
-const patientService =  PatientService
+import dbDriver from '../dbDriver.js'
+const patientService =  new PatientService(dbDriver);
 import iconv from 'iconv-lite';
 import encodings from 'iconv-lite/encodings';
 iconv.encodings = encodings;
@@ -13,16 +14,16 @@ describe('Testing Service/createPatientAndReturnCurrentPatient', () => {
     patientService.clearDatabase();
   });
   test("create first patient from service and return first patient at queue", async () => {
-    const currentPatient = await patientService.createPatientAndReturnCurrentPatient('ivan',"ca60dc10-1c40-44d6-a856-f272ea41d8da")
-    expect(currentPatient).toBe('ivan');
-    jest.setTimeout(10000);
+    const currentPatient = await patientService.createPatientAndReturnCurrentPatient('Kirill',"ca60dc10-1c40-44d6-a856-f272ea41d8da")
+    expect(currentPatient).toBe('Kirill');
+    // jest.setTimeout(10000);
 
   });
 
   test("create second patient from service and return first patient at queue", async () => {
-    const currentPatient = await patientService.createPatientAndReturnCurrentPatient('Serg', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
-    expect(currentPatient).toBe('ivan');
-    jest.setTimeout(10000);
+    const currentPatient = await patientService.createPatientAndReturnCurrentPatient('Petr', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
+    expect(currentPatient).toBe('Kirill');
+    // jest.setTimeout(10000);
   });
 })
 
@@ -32,13 +33,12 @@ describe('Testing Service/getCurrentInQueue', () => {
     patientService.clearDatabase();
   });
   beforeAll(async () => {
-    await patientService.createPatientAndReturnCurrentPatient('Serg', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
-    await patientService.createPatientAndReturnCurrentPatient('Ivan', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
-    await patientService.createPatientAndReturnCurrentPatient('Sergey', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
+    await patientService.createPatientAndReturnCurrentPatient('Alex', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
+    await patientService.createPatientAndReturnCurrentPatient('Dmitriy', "ca60dc10-1c40-44d6-a856-f272ea41d8da")
   });
-  test("created three new patient and return first patient in queue", async () => {
-    const currentPatientInQueue = await QueueService.getCurrentInQueue()
-    expect(currentPatientInQueue).toBe('Serg');
+  test("created three new patient and return  current patient in queue", async () => {
+    const currentPatientInQueue  = await QueueService.getCurrentInQueue()
+    expect(currentPatientInQueue).toBe('Alex');
     jest.setTimeout(10000);
 
   })

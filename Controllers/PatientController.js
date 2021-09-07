@@ -1,7 +1,8 @@
-import PatientService from '../Services/PatientService.js'
+import patientService from '../Services/PatientService.js'
 import createPatientSchema from '../schema/createPatientSchema.js'
 import validate from '../utilities/validate.js'
 import dbDriver from '../dbDriver.js';
+const PatientService = new patientService(dbDriver);
 class PatientController {
     async createPatientAndReturnCurrentPatient(req, res, next) {
         console.log(req.body)

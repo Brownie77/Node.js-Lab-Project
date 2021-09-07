@@ -229,7 +229,6 @@ export default class {
         const patient_id = crypto.randomUUID({
             disableEntropyCache: true
         });
-        console.log(userId)
         await this.patient.create({
             id: patient_id,
             name: patientName,
