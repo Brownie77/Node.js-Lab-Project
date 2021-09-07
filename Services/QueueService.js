@@ -1,4 +1,7 @@
 import Database from '../dbDriver.js';
+if(Database === undefined) {
+    console.log('Database is not available')
+}
 class QueueService {
 
     async deleteFirstFromQueue() {
