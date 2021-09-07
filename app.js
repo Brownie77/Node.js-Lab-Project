@@ -6,29 +6,20 @@ import router from './router.js';
 import cors from 'cors';
 import config from './config.js';
 import errorHandler from "./errors/errorHandler.js";
-import crypto from "crypto";
-import cookieParser from 'cookie-parser'
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 
-// app.use(express.static('public'));
-app.use('/static', express.static(__dirname + '/public'));
-console.log(__dirname+ '/public')
-app.use(cors({ origin: true, credentials: true }));
-app.use(cookieParser());
+
 app.use(express.json());
 app.use('/api', router);
-
+app.use(express.static('public'));
+app.use(cors())
 
 app.listen(config.app.PORT, config.app.HOST);
 process.on('unhandledRejection', error => {
     throw error
 })
+
 process.on('uncaughtException', error => {
     errorHandler.logError(error)
 

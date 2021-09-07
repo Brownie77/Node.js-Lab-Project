@@ -1,8 +1,6 @@
 import sqlz from 'sequelize';
 import crypto from 'crypto';
 import Api404Error from '../errors/api404Error.js';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
 
 const {
     Sequelize,
@@ -16,9 +14,9 @@ const sequelize = new Sequelize("medstage", "root", "KevalaKumar1995", {
 
 });
 try {
-    sequelize.authenticate();
+     sequelize.authenticate();
     console.log('Connection has been established successfully.');
-    (async () => {
+    (async() => {
         await sequelize.sync()
     })()
 } catch (error) {
@@ -26,39 +24,6 @@ try {
 }
 
 export default class {
-    user = sequelize.define(
-        'User', {
-            id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                primaryKey: true,
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            password: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            birthday: {
-                type: DataTypes.DATE,
-                allowNull: false,
-            },
-            gender: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            token: {
-                type: DataTypes.STRING,
-            }
-
-
-        });
     patient = sequelize.define(
         'Patient', {
             id: {
@@ -69,18 +34,8 @@ export default class {
             name: {
                 type: DataTypes.STRING,
                 allowNull: false,
-            },
-            user_id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                references: {
-                    model: this.user,
-                    key: 'id',
-                }
             }
         });
-    //email, password,  name, birthday, gender
-    
     queue = sequelize.define(
         'Queue', {
             id: {
@@ -124,23 +79,11 @@ export default class {
         });
     async clearDatabase() {
 
-        await this.queue.destroy({
-            truncate: {
-                cascade: true
-            }
-        });
+        await this.queue.destroy({ truncate: { cascade: true } });
 
-        await this.resolution.destroy({
-            truncate: {
-                cascade: true
-            }
-        });
+        await this.resolution.destroy({ truncate: { cascade: true } });
 
-        await this.patient.destroy({
-            truncate: {
-                cascade: true
-            }
-        });
+        await this.patient.destroy({ truncate: { cascade: true } });
 
     }
     async expireTimeIsOut(createdAt, expireTime) {
@@ -148,94 +91,17 @@ export default class {
         const creationDateInMilliseconds = Date.parse(createdAt.toISOString())
         return creationDateInMilliseconds + (expireTime * 1000) > Date.now() ? false : true
     }
-    async registrationNewUser(payload) {
-        await this.user.sync()
-        const user_id = crypto.randomUUID({
-            disableEntropyCache: true
-        });
-        const token = jwt.sign({
-                id: user_id,
-                email: payload.email
-            },
-            process.env.TOKEN_SECRET, {
-                expiresIn: "1m",
-            }
-        );
-        const oldUser = await this.user.findAll({
-            raw: true,
-            where: {
-                email: payload.email
-            }
-        })
-        if (oldUser[0]) {
-            throw new Error('User Already Exist. Please Login')
-            // return res.status(409).send("User Already Exist. Please Login");
-        }
-        const encryptedPassword = await bcrypt.hash(payload.password, 10);
-
-        const newUser = await this.user.create({
-            id: user_id,
-            email: payload.email,
-            password: encryptedPassword,
-            name: payload.name,
-            birthday: new Date(1980, 6, 20),
-            gender: payload.gender,
-            token: token
-        })
-        return newUser.token;
-    }
-
-    async userLogin(payload) {
-        await this.user.sync();
-        const {
-            email,
-            password
-        } = payload;
-        const user = await this.user.findAll({
-            raw: true,
-            where: {
-                email: email,
-            }
-        });
-        console.log(user);
-
-        if (user && (await bcrypt.compare(password, user[0].password))) {
-            console.log(`---------------`)
-            const token = jwt.sign({
-                    id: user[0].id,
-                    email: payload.email
-                },
-                process.env.TOKEN_SECRET, {
-                    expiresIn: "1m",
-                }
-            );
-            await this.user.update({
-                token: token
-            }, {
-                where: {
-                    email: email
-                }
-            });
-            user[0].token = token;
-            return user[0];
-        } else {
-            throw new Api404Error(`Invalid user or password`)
-        }
-
-    }
-
-    async createPatientAndReturnCurrentPatient(patientName, userId) {
+    async createPatientAndReturnCurrentPatient(name) {
         await this.patient.sync()
         const patient_id = crypto.randomUUID({
             disableEntropyCache: true
         });
-        console.log(userId)
         await this.patient.create({
             id: patient_id,
-            name: patientName,
-            user_id: userId,
+            name
         })
         await this.addToQueue(patient_id);
+        console.log(await this.getCountOfQueue())
         const currentPatientInQueue = await this.getCurrentInQueue();
         return currentPatientInQueue;
     }
