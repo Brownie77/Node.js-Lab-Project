@@ -5,8 +5,12 @@ export default {
         type: "string",
         minLength: 2
       },
+      user_id: {
+        type: "string",
+        minLength: 36
+      }
     },
-    required: ["name"],
+    required: ["name", "user_id"],
     additionalProperties: false
   }
 

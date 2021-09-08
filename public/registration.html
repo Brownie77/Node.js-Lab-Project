@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form id="create-user-form"class='registration-form' action="#" >
+        <p class>MedStage Registration</p>
+        <label for="registration-email">Email</label>
+        <input id="registration-email" type="email" name="email" value="vasya.puplin@gmail.com">
+        <label for="registration-name">Name</label>
+        <input id="registration-name" type="text" name="name" value="Vasiliy">
+        <label for="registration-password">Password</label>
+        <input id="registration-password" type="password" name="password" value="1234">
+        <label for="registration-birthday">Date of Birth</label>
+        <input id="registration-birthday" type="date" name="birthday" value="1995-04-12">
+        <label for="registration-gender-male">Male</label>
+        <input id="registration-gender-male" type="radio" name="gender" value="Male">
+        <label for="registration-gender-male">Female</label>
+        <input id="registration-gender-female" type="radio" name="gender" value="Female">
+        <input type="submit" value="OK" onclick="createUser()">
+    </form>
+    <script src="reglog.js"></script>
+
+</body>
+
+</html>
+
+<!-- //"email": "vasya.puplin@gmail.com",
+"password": "1234",
+"name": "Vasiliy",
+"birthday": "26.04.1995",
+"gender": "male" -->
