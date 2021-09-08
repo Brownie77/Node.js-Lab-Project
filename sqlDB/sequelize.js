@@ -2,401 +2,516 @@ import sqlz from 'sequelize';
 import crypto from 'crypto';
 import Api404Error from '../errors/api404Error.js';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
+import { raw } from 'express';
 
-const {
-    Sequelize,
-    DataTypes
-} = sqlz;
-
-const sequelize = new Sequelize("medstage", "root", "KevalaKumar1995", {
-    dialect: "mysql",
-    host: "localhost",
-    logging: false
-
+const { Sequelize, DataTypes } = sqlz;
+const sequelize = new Sequelize('itrex', 'root', process.env.DB_PASSWORD, {
+  dialect: 'mysql',
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  logging: false,
 });
 try {
-    sequelize.authenticate();
+  sequelize.authenticate().then(() => {
     console.log('Connection has been established successfully.');
-    (async () => {
-        await sequelize.sync()
-    })()
+  });
+  (async () => {
+    await sequelize.sync();
+  })();
 } catch (error) {
-    console.error('Unable to connect to the database:', error);
+  console.error('Unable to connect to the database:', error);
 }
 
 export default class {
-    user = sequelize.define(
-        'User', {
-            id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                primaryKey: true,
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            password: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            birthday: {
-                type: DataTypes.DATE,
-                allowNull: false,
-            },
-            gender: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            token: {
-                type: DataTypes.STRING,
-            }
+  constructor() {
+    this.initSchemas();
+  }
 
+  async sync() {
+    await this.user.sync();
+    await this.patient.sync();
+    await this.role.sync();
+    await this.queue.sync();
+    await this.doctor.sync();
+    return this.resolution.sync();
+  }
 
-        });
-    patient = sequelize.define(
-        'Patient', {
-            id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                primaryKey: true,
-            },
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            user_id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                references: {
-                    model: this.user,
-                    key: 'id',
-                }
-            }
-        });
+  async initSchemas() {
+    this.user = sequelize.define('User', {
+      id: {
+        type: DataTypes.STRING,
+        defaultValue: Sequelize.UUIDV1,
+        allowNull: false,
+        primaryKey: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      birthday: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      gender: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      token: {
+        type: DataTypes.STRING,
+      },
+    });
+    this.patient = sequelize.define('Patient', {
+      id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      user_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+          model: this.user,
+          key: 'id',
+        },
+      },
+    });
+
+    this.role = sequelize.define(
+      'Role',
+      {
+        id: {
+          primaryKey: true,
+          type: Sequelize.INTEGER,
+          autoIncrement: true,
+          allowNull: false,
+        },
+        title: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+      },
+      { timestamps: false },
+    );
+
+    this.doctor = sequelize.define('Doctor', {
+      id: {
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV1,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      role_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: this.role,
+          key: 'id',
+        },
+      },
+      user_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+          model: this.user,
+          key: 'id',
+        },
+      },
+    });
     //email, password,  name, birthday, gender
-    
-    queue = sequelize.define(
-        'Queue', {
-            id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                primaryKey: true,
-            },
-            patient_id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                references: {
-                    model: this.patient,
-                    key: 'id',
-                }
-            }
-        });
-    resolution = sequelize.define(
-        'Resolution', {
-            id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                primaryKey: true,
-            },
-            patient_id: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                references: {
-                    model: this.patient,
-                    key: 'id',
-                }
-            },
-            value: {
-                type: DataTypes.TEXT,
-                allowNull: false,
-            },
-            expire_time: {
-                type: DataTypes.INTEGER,
-                defaultValue: null
+    this.queue = sequelize.define('Queue', {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+      },
+      patient_id: {
+        type: DataTypes.STRING,
+        references: {
+          model: this.patient,
+          key: 'id',
+        },
+      },
+      doctor_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: this.doctor,
+          key: 'id',
+        },
+      },
+    });
+    this.resolution = sequelize.define('Resolution', {
+      id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      patient_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+          model: this.patient,
+          key: 'id',
+        },
+      },
+      doctor_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: this.doctor,
+          key: 'id',
+        },
+      },
+      value: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      expire_time: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+      },
+    });
+    await this.sync();
+  }
 
-            }
-        });
-    async clearDatabase() {
+  async clearDatabase() {
+    await this.queue.destroy({
+      truncate: {
+        cascade: true,
+      },
+    });
 
-        await this.queue.destroy({
-            truncate: {
-                cascade: true
-            }
-        });
+    await this.resolution.destroy({
+      truncate: {
+        cascade: true,
+      },
+    });
 
-        await this.resolution.destroy({
-            truncate: {
-                cascade: true
-            }
-        });
-
-        await this.patient.destroy({
-            truncate: {
-                cascade: true
-            }
-        });
-
+    await this.patient.destroy({
+      truncate: {
+        cascade: true,
+      },
+    });
+  }
+  async expireTimeIsOut(createdAt, expireTime) {
+    Date.parse(createdAt.toISOString());
+    const creationDateInMilliseconds = Date.parse(createdAt.toISOString());
+    return creationDateInMilliseconds + expireTime * 1000 > Date.now()
+      ? false
+      : true;
+  }
+  async registrationNewUser(payload) {
+    const user_id = crypto.randomUUID({
+      disableEntropyCache: true,
+    });
+    const token = jwt.sign(
+      {
+        id: user_id,
+        email: payload.email,
+      },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: '1m',
+      },
+    );
+    const oldUser = await this.user.findAll({
+      raw: true,
+      where: {
+        email: payload.email,
+      },
+    });
+    if (oldUser[0]) {
+      throw new Error('User Already Exist. Please Login');
+      // return res.status(409).send("User Already Exist. Please Login");
     }
-    async expireTimeIsOut(createdAt, expireTime) {
-        Date.parse(createdAt.toISOString())
-        const creationDateInMilliseconds = Date.parse(createdAt.toISOString())
-        return creationDateInMilliseconds + (expireTime * 1000) > Date.now() ? false : true
+    const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
+    const newUser = await this.user.create({
+      id: user_id,
+      email: payload.email,
+      password: encryptedPassword,
+      name: payload.name,
+      birthday: new Date(1980, 6, 20),
+      gender: payload.gender,
+      token: token,
+    });
+    return newUser.token;
+  }
+
+  async userLogin(payload) {
+    const { email, password } = payload;
+    const user = await this.user.findAll({
+      raw: true,
+      where: {
+        email: email,
+      },
+    });
+    console.log(user);
+
+    if (user && (await bcrypt.compare(password, user[0].password))) {
+      console.log(`---------------`);
+      const token = jwt.sign(
+        {
+          id: user[0].id,
+          email: payload.email,
+        },
+        process.env.TOKEN_SECRET,
+        {
+          expiresIn: '1m',
+        },
+      );
+      await this.user.update(
+        {
+          token: token,
+        },
+        {
+          where: {
+            email: email,
+          },
+        },
+      );
+      user[0].token = token;
+      return user[0];
+    } else {
+      throw new Api404Error(`Invalid user or password`);
     }
-    async registrationNewUser(payload) {
-        await this.user.sync()
-        const user_id = crypto.randomUUID({
-            disableEntropyCache: true
+  }
+
+  async doctorLogin(payload) {
+    const { email, password } = payload;
+    const user = await this.user.findOne({
+      raw: true,
+      where: {
+        email: email,
+      },
+    });
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        const doctor = await this.doctor.findOne({
+          raw: true,
+          where: {
+            user_id: user.id,
+          },
         });
-        const token = jwt.sign({
-                id: user_id,
-                email: payload.email
-            },
-            process.env.TOKEN_SECRET, {
-                expiresIn: "1m",
-            }
+
+        if (!doctor) {
+          throw new Api404Error('This user is not a doctor');
+        }
+
+        const token = jwt.sign(
+          {
+            doctorId: doctor.id,
+          },
+          process.env.TOKEN_SECRET,
         );
-        const oldUser = await this.user.findAll({
-            raw: true,
-            where: {
-                email: payload.email
-            }
-        })
-        if (oldUser[0]) {
-            throw new Error('User Already Exist. Please Login')
-            // return res.status(409).send("User Already Exist. Please Login");
-        }
-        const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
-        const newUser = await this.user.create({
-            id: user_id,
-            email: payload.email,
-            password: encryptedPassword,
-            name: payload.name,
-            birthday: new Date(1980, 6, 20),
-            gender: payload.gender,
-            token: token
-        })
-        return newUser.token;
+        return token;
+      }
+    } else {
+      throw new Api404Error('No such user');
     }
+  }
 
-    async userLogin(payload) {
-        await this.user.sync();
-        const {
-            email,
-            password
-        } = payload;
-        const user = await this.user.findAll({
-            raw: true,
-            where: {
-                email: email,
-            }
-        });
-        console.log(user);
+  async createPatientAndReturnCurrentPatient(
+    patientName,
+    userId,
+    role,
+    doctor,
+  ) {
+    const patient_id = crypto.randomUUID({
+      disableEntropyCache: true,
+    });
+    await this.patient.create({
+      id: patient_id,
+      name: patientName,
+      user_id: userId,
+    });
+    await this.addToQueue(patient_id, role, doctor);
+    const currentPatientInQueue = await this.getCurrentInQueue();
+    return currentPatientInQueue;
+  }
+  async createPatient(name) {
+    const patient_id = crypto.randomUUID({
+      disableEntropyCache: true,
+    });
+    await this.Patient.create({
+      id: patient_id,
+      name,
+    });
+    this.addToQueue(patient_id);
+  }
 
-        if (user && (await bcrypt.compare(password, user[0].password))) {
-            console.log(`---------------`)
-            const token = jwt.sign({
-                    id: user[0].id,
-                    email: payload.email
-                },
-                process.env.TOKEN_SECRET, {
-                    expiresIn: "1m",
-                }
-            );
-            await this.user.update({
-                token: token
-            }, {
-                where: {
-                    email: email
-                }
-            });
-            user[0].token = token;
-            return user[0];
-        } else {
-            throw new Api404Error(`Invalid user or password`)
-        }
+  async addToQueue(patient_id, role, doctor) {
+    const { id: role_id } = await this.role.findOne({
+      raw: true,
+      where: { title: role },
+    });
+    const { id: doctor_id } = await this.doctor.findOne({
+      raw: true,
+      where: { name: doctor, role_id },
+    });
+    const currentPatientInQueue = await this.queue.create({
+      patient_id,
+      doctor_id,
+    });
+    return currentPatientInQueue;
+  }
 
+  async getCurrentInQueue() {
+    const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
+    if (patientInfo === null) {
+      return null;
     }
+    return patientInfo[0]?.name || null;
+  }
 
-    async createPatientAndReturnCurrentPatient(patientName, userId) {
-        await this.patient.sync()
-        const patient_id = crypto.randomUUID({
-            disableEntropyCache: true
-        });
-        console.log(userId)
-        await this.patient.create({
-            id: patient_id,
-            name: patientName,
-            user_id: userId,
-        })
-        await this.addToQueue(patient_id);
-        const currentPatientInQueue = await this.getCurrentInQueue();
-        return currentPatientInQueue;
+  async getAllInfoOfCurrentPatientInQueue() {
+    const currentPatientInQueue = await this.queue.findAll({
+      limit: 1,
+      raw: true,
+      order: [['createdAt', 'ASC']],
+    });
+    if (currentPatientInQueue.length === 0) {
+      return null;
     }
-    async createPatient(name) {
-        const patient_id = crypto.randomUUID({
-            disableEntropyCache: true
-        });
-        await this.Patient.create({
-            id: patient_id,
-            name
-        })
-        this.addToQueue(patient_id)
+    const patient = await this.patient.findAll({
+      raw: true,
+      where: {
+        id: currentPatientInQueue[0].patient_id,
+      },
+    });
+    return patient;
+  }
+
+  async getCountOfQueue() {
+    const amountPatientsInQueue = await this.queue.count();
+    return amountPatientsInQueue;
+  }
+
+  async getAndDeleteFirstFromQueue() {
+    const patient = await this.getAllInfoOfCurrentPatientInQueue();
+    if (patient === undefined) {
+      throw new Api404Error(`Patient with id: ${patient[0].id} not found.`);
     }
+    const deletedPatient = await this.queue.destroy({
+      where: {
+        patient_id: patient[0].id,
+      },
+    });
+    console.log(deletedPatient);
+    return deletedPatient;
+  }
 
-    async addToQueue(patient_id) {
-        await this.queue.sync()
-        const uuid = crypto.randomUUID({
-            disableEntropyCache: true
-        });
-        const currentPatientInQueue = await this.queue.create({
-            id: uuid,
-            patient_id
-        })
-        return currentPatientInQueue
+  async createResolution(resolutionText, lifetime) {
+    const uuid = crypto.randomUUID({
+      disableEntropyCache: true,
+    });
+    const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
+    const newResolution = await this.resolution.create({
+      id: uuid,
+      patient_id: patientInfo[0].id,
+      value: resolutionText,
+      expire_time: lifetime,
+    });
+  }
+
+  async getResolution(name) {
+    const patient = await this.patient.findAll({
+      limit: 10,
+      raw: true,
+      where: {
+        name: name,
+      },
+      order: [['createdAt', 'ASC']],
+    });
+    if (patient.length === 0) {
+      throw new Api404Error(`The user named ${name} was not found`);
     }
+    const searchedResolution = await this.resolution.findAll({
+      raw: true,
+      where: {
+        patient_id: patient[0].id,
+      },
+      order: [['createdAt', 'ASC']],
+    });
 
-    async getCurrentInQueue() {
-        const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
-        if (patientInfo === null) {
-            return null;
-        }
-        return patientInfo[0].name
+    if (searchedResolution.length === 0) {
+      throw new Api404Error(
+        `This patient has no resolutions yet or resolution was deleted`,
+      );
     }
-
-    async getAllInfoOfCurrentPatientInQueue() {
-        await this.queue.sync()
-        const currentPatientInQueue = await this.queue.findAll({
-            limit: 1,
-            raw: true,
-            order: [
-                ['createdAt', 'ASC']
-            ]
-        });
-        if (currentPatientInQueue.length === 0) {
-            return null;
-        }
-        const patient = await this.patient.findAll({
-            raw: true,
-            where: {
-                id: currentPatientInQueue[0].patient_id
-            }
-        });
-        return patient
+    if (
+      await this.expireTimeIsOut(
+        searchedResolution[0].createdAt,
+        searchedResolution[0].expire_time,
+      )
+    ) {
+      await this.resolution.destroy({
+        where: {
+          patient_id: patient[0].id,
+        },
+      });
     }
+    return searchedResolution[0].value;
+  }
 
-
-    async getCountOfQueue() {
-        await this.queue.sync()
-        const amountPatientsInQueue = await this.queue.count();
-        return amountPatientsInQueue;
+  async deleteResolution(name) {
+    const patient = await this.patient.findAll({
+      limit: 1,
+      raw: true,
+      where: {
+        name: name,
+      },
+      order: [['createdAt', 'ASC']],
+    });
+    const searchedResolution = await this.resolution.findAll({
+      limit: 1,
+      raw: true,
+      where: {
+        patient_id: patient[0].id,
+      },
+      order: [['createdAt', 'ASC']],
+    });
+    if (searchedResolution.length === 0) {
+      throw new Api404Error(`This patient has no resolutions`);
     }
+    await this.resolution.destroy({
+      where: {
+        patient_id: patient[0].id,
+      },
+    });
+    return searchedResolution[0].value;
+  }
 
+  async fetchRoles() {
+    return this.role.findAll({});
+  }
 
-    async getAndDeleteFirstFromQueue() {
-        await this.queue.sync()
-        const patient = await this.getAllInfoOfCurrentPatientInQueue()
-        if (patient === undefined) {
-            throw new Api404Error(`Patient with id: ${patient[0].id} not found.`);
-        }
-        const deletedPatient = await this.queue.destroy({
-            where: {
-                patient_id: patient[0].id
-            }
-        })
-        console.log(deletedPatient)
-        return deletedPatient;
-    }
+  async fetchDoctors(role) {
+    const { id } = await this.role.findOne({
+      raw: true,
+      where: { title: role },
+    });
 
-    async createResolution(resolutionText, lifetime) {
-        await this.resolution.sync();
-        const uuid = crypto.randomUUID({
-            disableEntropyCache: true
-        });
-        const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
-        const newResolution = await this.resolution.create({
-            id: uuid,
-            patient_id: patientInfo[0].id,
-            value: resolutionText,
-            expire_time: lifetime
-        })
-    }
-
-    async getResolution(name) {
-        await this.resolution.sync();
-        const patient = await this.patient.findAll({
-            limit: 10,
-            raw: true,
-            where: {
-                name: name
-            },
-            order: [
-                ['createdAt', 'ASC']
-            ]
-        });
-        if (patient.length === 0) {
-            throw new Api404Error(`The user named ${name} was not found`);
-        }
-        const searchedResolution = await this.resolution.findAll({
-            raw: true,
-            where: {
-                patient_id: patient[0].id
-            },
-            order: [
-                ['createdAt', 'ASC']
-            ]
-
-        })
-
-        if (searchedResolution.length === 0) {
-            throw new Api404Error(`This patient has no resolutions yet or resolution was deleted`);
-        }
-        if (await this.expireTimeIsOut(searchedResolution[0].createdAt, searchedResolution[0].expire_time)) {
-            await this.resolution.destroy({
-                where: {
-                    patient_id: patient[0].id
-                }
-            });
-        }
-        return searchedResolution[0].value
-    }
-
-    async deleteResolution(name) {
-        await this.resolution.sync();
-        const patient = await this.patient.findAll({
-            limit: 1,
-            raw: true,
-            where: {
-                name: name
-            },
-            order: [
-                ['createdAt', 'ASC']
-            ]
-        });
-        const searchedResolution = await this.resolution.findAll({
-            limit: 1,
-            raw: true,
-            where: {
-                patient_id: patient[0].id
-            },
-            order: [
-                ['createdAt', 'ASC']
-            ]
-        })
-        if (searchedResolution.length === 0) {
-            throw new Api404Error(`This patient has no resolutions`);
-        }
-        await this.resolution.destroy({
-            where: {
-                patient_id: patient[0].id
-            }
-        });
-        return searchedResolution[0].value;
-    }
+    return this.doctor.findAll({ raw: true, where: { role_id: id } });
+  }
 }
