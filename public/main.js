@@ -21,20 +21,13 @@ window.onload = async function () {
         option.innerHTML = res.title;
         $select.append(option);
       });
-    }
-    const response = await fetch('http://localhost:3000/api/patient/current');
-    let currentPatient = await response.json();
-    if (currentPatient === null) {
-      if (window.location.pathname === '/static/doctor.html') {
+    } else if (window.location.pathname === '/static/doctor.html') {
+      const response = await fetch('http://localhost:3000/api/patient/current');
+      const currentPatient = await response.json();
+      if (currentPatient === null) {
         currentPatientNameforDoctor.textContent = 'Queue is empty';
       } else {
-        currentPatientNameforPatient.textContent = 'Queue is empty';
-      }
-    } else {
-      if (window.location.pathname === '/static/doctor.html') {
         currentPatientNameforDoctor.textContent = currentPatient;
-      } else {
-        currentPatientNameforPatient.textContent = currentPatient;
       }
     }
   } catch (error) {
@@ -79,9 +72,10 @@ async function addNewPatient() {
 }
 
 async function fetchDoctorsList() {
+  hideInput();
+  const $selectDoctor = document.getElementById('doctors-list');
   const $doctors = document.getElementById('doctors-dropdown');
   $doctors.style.display = 'block';
-  const $selectDoctor = document.getElementById('doctors-list');
   $selectDoctor.innerHTML =
     '<option disabled selected value>-- select one --</option>';
   const spec = document.getElementById('specializations').value;
@@ -96,6 +90,11 @@ async function fetchDoctorsList() {
   });
 }
 
+function hideInput() {
+  const $input = document.getElementsByClassName('add-patient-box')[0];
+  $input.style.display = 'none';
+}
+
 function displayInput() {
   const $input = document.getElementsByClassName('add-patient-box')[0];
   $input.style.display = 'flex';
@@ -105,11 +104,9 @@ async function nextPatient() {
   try {
     let response = await fetch('http://localhost:3000/api/patient/next');
     let currentPatient = await response.json();
-    console.log(currentPatient);
     // checkLifetime();
     if (currentPatient === null) {
       currentPatientNameforDoctor.textContent = 'Queue is empty';
-      currentPatientNameforPatient.textContent = 'Queue is empty';
     } else {
       currentPatientNameforDoctor.textContent = currentPatient;
       // currentPatientNameforPatient.textContent = currentPatient;

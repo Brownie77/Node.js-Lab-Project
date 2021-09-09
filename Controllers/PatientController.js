@@ -8,7 +8,7 @@ class PatientController {
     const valid = validate(req.body, createPatientSchema);
     try {
       if (valid) {
-        await PatientService.createPatientAndReturnCurrentPatient(
+        await PatientService.createPatientAndAddToQueue(
           req.body.name,
           req.body.user_id,
           req.params.role,
@@ -50,14 +50,6 @@ class PatientController {
         secure: false,
       });
       res.json(user);
-    } catch (error) {
-      next(error);
-    }
-  }
-  async doctorLogin(req, res, next) {
-    try {
-      const doctor = await PatientService.doctorLogin(req.body);
-      res.json(doctor);
     } catch (error) {
       next(error);
     }

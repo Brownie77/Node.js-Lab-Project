@@ -1,0 +1,58 @@
+-- MySQL dump 10.13  Distrib 8.0.26, for Win64 (x86_64)
+--
+-- Host: localhost    Database: itrex
+-- ------------------------------------------------------
+-- Server version	8.0.26
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `birthday` datetime NOT NULL,
+  `gender` varchar(255) NOT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES ('4132f38d-f0f1-4ec8-8bff-422e97d26dac','sugeon@gmail.com','$2b$10$pSK72ZCWP097vsdTD.tT7O6qo.GWLsTJPaWfBAyOLkol7DMD1GM3i','Sam','1980-07-19 21:00:00','Female','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQxMzJmMzhkLWYwZjEtNGVjOC04YmZmLTQyMmU5N2QyNmRhYyIsImVtYWlsIjoic3VnZW9uQGdtYWlsLmNvbSIsImlhdCI6MTYzMTExODc0NywiZXhwIjoxNjMxMTE4ODA3fQ.kUVA9uNqP4LNgGy4xcHgjh0zMD5AroU5PZOIeZjmeTc','2021-09-08 16:32:28','2021-09-08 16:32:28'),('ab3bb1fd-ed5b-4f51-bd48-274ec46a53cc','vasya.puplin@gmail.com','$2b$10$ipnXszHZSwCZTck7yMMTq.pIy2sugKKxx2UWDFyEWVbIMEQ/LeNPa','Vasiliy','1980-07-19 21:00:00','Male','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFiM2JiMWZkLWVkNWItNGY1MS1iZDQ4LTI3NGVjNDZhNTNjYyIsImVtYWlsIjoidmFzeWEucHVwbGluQGdtYWlsLmNvbSIsImlhdCI6MTYzMTE5Mjc3Mn0.ji7G3tOe1dgeZRJui1mHMl36cXshRVH-eoKGiByAmQU','2021-09-08 16:32:05','2021-09-09 13:06:12'),('c7abb227-57c7-4b22-aae6-7652a78171eb','sugeon2@gmail.com','$2b$10$IB.Hk0BBZKJ5nElMdMyrceilRErt2wBgkZ/Z6JhcqcI7yeTWZIPKm','Ann','1980-07-19 21:00:00','Female','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImM3YWJiMjI3LTU3YzctNGIyMi1hYWU2LTc2NTJhNzgxNzFlYiIsImVtYWlsIjoic3VnZW9uMkBnbWFpbC5jb20iLCJpYXQiOjE2MzExMTg3MzUsImV4cCI6MTYzMTExODc5NX0.atA0q5rBTBBbPkgui8CtBBLDAzoSYz5JQQOtmUswg5I','2021-09-08 16:32:15','2021-09-08 16:32:15');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2021-09-09 16:10:02

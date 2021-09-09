@@ -8,14 +8,14 @@ class QueueService {
     return deletedFirst;
   }
 
-  async getCurrentInQueue() {
-    const currentInQueue = await Database.getCurrentInQueue();
+  async getCurrentInQueue(token) {
+    const currentInQueue = await Database.getCurrentInQueue(token);
     return currentInQueue;
   }
 
-  async nextPatientInQueue() {
-    await Database.getAndDeleteFirstFromQueue();
-    const isNextPatient = await Database.getCurrentInQueue();
+  async nextPatientInQueue(token) {
+    await Database.getAndDeleteFirstFromQueue(token);
+    const isNextPatient = await Database.getCurrentInQueue(token);
     return isNextPatient;
   }
 

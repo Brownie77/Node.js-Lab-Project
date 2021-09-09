@@ -1,13 +1,19 @@
 import QueueService from '../Services/QueueService.js';
 class QueueController {
   async getCurrentInQueue(req, res, next) {
-    const currentInQueue = await QueueService.getCurrentInQueue();
-    res.json(currentInQueue);
+    try {
+      const token = req.cookies.access_token;
+      const currentInQueue = await QueueService.getCurrentInQueue(token);
+      res.json(currentInQueue);
+    } catch (err) {
+      next(err);
+    }
   }
 
   async nextPatientInQueue(req, res, next) {
     try {
-      const nextPatient = await QueueService.nextPatientInQueue();
+      const token = req.cookies.access_token;
+      const nextPatient = await QueueService.nextPatientInQueue(token);
       res.json(nextPatient);
     } catch (err) {
       next(err);

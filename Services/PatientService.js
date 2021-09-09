@@ -1,13 +1,7 @@
 import Database from '../dbDriver.js';
 class PatientService {
-  async createPatientAndReturnCurrentPatient(name, user_id, role, doctor) {
-    const returnedPatient = await Database.createPatientAndReturnCurrentPatient(
-      name,
-      user_id,
-      role,
-      doctor,
-    );
-    return returnedPatient;
+  async createPatientAndAddToQueue(name, user_id, role, doctor) {
+    return Database.createPatientAndAddToQueue(name, user_id, role, doctor);
   }
 
   async getAllPatients() {

@@ -228,9 +228,6 @@ export default class {
         email: payload.email,
       },
       process.env.TOKEN_SECRET,
-      {
-        expiresIn: '1m',
-      },
     );
     const oldUser = await this.user.findAll({
       raw: true,
@@ -274,9 +271,6 @@ export default class {
           email: payload.email,
         },
         process.env.TOKEN_SECRET,
-        {
-          expiresIn: '1m',
-        },
       );
       await this.user.update(
         {
@@ -331,12 +325,7 @@ export default class {
     }
   }
 
-  async createPatientAndReturnCurrentPatient(
-    patientName,
-    userId,
-    role,
-    doctor,
-  ) {
+  async createPatientAndAddToQueue(patientName, userId, role, doctor) {
     const patient_id = crypto.randomUUID({
       disableEntropyCache: true,
     });
@@ -345,10 +334,9 @@ export default class {
       name: patientName,
       user_id: userId,
     });
-    await this.addToQueue(patient_id, role, doctor);
-    const currentPatientInQueue = await this.getCurrentInQueue();
-    return currentPatientInQueue;
+    return this.addToQueue(patient_id, role, doctor);
   }
+
   async createPatient(name) {
     const patient_id = crypto.randomUUID({
       disableEntropyCache: true,
@@ -376,18 +364,22 @@ export default class {
     return currentPatientInQueue;
   }
 
-  async getCurrentInQueue() {
-    const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
+  async getCurrentInQueue(token) {
+    const doctor = jwt.verify(token, process.env.TOKEN_SECRET);
+    const doctor_id = doctor.doctorId;
+
+    const patientInfo = await this.getAllInfoOfCurrentPatientInQueue(doctor_id);
     if (patientInfo === null) {
       return null;
     }
     return patientInfo[0]?.name || null;
   }
 
-  async getAllInfoOfCurrentPatientInQueue() {
+  async getAllInfoOfCurrentPatientInQueue(doctor_id) {
     const currentPatientInQueue = await this.queue.findAll({
       limit: 1,
       raw: true,
+      where: { doctor_id },
       order: [['createdAt', 'ASC']],
     });
     if (currentPatientInQueue.length === 0) {
@@ -407,14 +399,19 @@ export default class {
     return amountPatientsInQueue;
   }
 
-  async getAndDeleteFirstFromQueue() {
-    const patient = await this.getAllInfoOfCurrentPatientInQueue();
-    if (patient === undefined) {
-      throw new Api404Error(`Patient with id: ${patient[0].id} not found.`);
-    }
+  async getAndDeleteFirstFromQueue(token) {
+    const doctor = jwt.verify(token, process.env.TOKEN_SECRET);
+    const doctor_id = doctor.doctorId;
+
+    const firstInQueue = await this.queue.findOne({
+      raw: true,
+      where: { doctor_id },
+      order: [['createdAt', 'ASC']],
+    });
+
     const deletedPatient = await this.queue.destroy({
       where: {
-        patient_id: patient[0].id,
+        id: firstInQueue.id,
       },
     });
     console.log(deletedPatient);
