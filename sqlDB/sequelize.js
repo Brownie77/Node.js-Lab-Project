@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import Api404Error from '../errors/api404Error.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { raw } from 'express';
 
 const { Sequelize, DataTypes } = sqlz;
 const sequelize = new Sequelize('itrex', 'root', process.env.DB_PASSWORD, {
@@ -88,7 +87,6 @@ export default class {
         },
       },
     });
-
     this.role = sequelize.define(
       'Role',
       {
@@ -105,7 +103,6 @@ export default class {
       },
       { timestamps: false },
     );
-
     this.doctor = sequelize.define('Doctor', {
       id: {
         primaryKey: true,
@@ -180,6 +177,14 @@ export default class {
           key: 'id',
         },
       },
+      role_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: this.role,
+          key: 'id',
+        },
+      },
       value: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -189,7 +194,7 @@ export default class {
         defaultValue: null,
       },
     });
-    await this.sync();
+    return this.sync();
   }
 
   async clearDatabase() {
@@ -211,13 +216,13 @@ export default class {
       },
     });
   }
+
   async expireTimeIsOut(createdAt, expireTime) {
     Date.parse(createdAt.toISOString());
     const creationDateInMilliseconds = Date.parse(createdAt.toISOString());
-    return creationDateInMilliseconds + expireTime * 1000 > Date.now()
-      ? false
-      : true;
+    return creationDateInMilliseconds + expireTime * 1000 < Date.now();
   }
+
   async registrationNewUser(payload) {
     const user_id = crypto.randomUUID({
       disableEntropyCache: true,
@@ -317,7 +322,6 @@ export default class {
           },
           process.env.TOKEN_SECRET,
         );
-
         return token;
       }
     } else {
@@ -326,26 +330,23 @@ export default class {
   }
 
   async createPatientAndAddToQueue(patientName, userId, role, doctor) {
-    const patient_id = crypto.randomUUID({
-      disableEntropyCache: true,
+    const exist = await this.patient.findOne({
+      raw: true,
+      where: { name: patientName },
     });
-    await this.patient.create({
-      id: patient_id,
-      name: patientName,
-      user_id: userId,
-    });
-    return this.addToQueue(patient_id, role, doctor);
-  }
-
-  async createPatient(name) {
-    const patient_id = crypto.randomUUID({
-      disableEntropyCache: true,
-    });
-    await this.Patient.create({
-      id: patient_id,
-      name,
-    });
-    this.addToQueue(patient_id);
+    console.log(exist);
+    if (!exist) {
+      const patient_id = crypto.randomUUID({
+        disableEntropyCache: true,
+      });
+      await this.patient.create({
+        id: patient_id,
+        name: patientName,
+        user_id: userId,
+      });
+      return this.addToQueue(patient_id, role, doctor);
+    }
+    return this.addToQueue(exist.id, role, doctor);
   }
 
   async addToQueue(patient_id, role, doctor) {
@@ -418,38 +419,47 @@ export default class {
     return deletedPatient;
   }
 
-  async createResolution(resolutionText, lifetime) {
+  async createResolution(resolutionText, lifetime, token) {
+    const { doctorId: doctor_id } = jwt.verify(token, process.env.TOKEN_SECRET);
     const uuid = crypto.randomUUID({
       disableEntropyCache: true,
     });
-    const patientInfo = await this.getAllInfoOfCurrentPatientInQueue();
-    const newResolution = await this.resolution.create({
+    const patientInfo = await this.getAllInfoOfCurrentPatientInQueue(doctor_id);
+    const { role_id } = await this.doctor.findOne({
+      raw: true,
+      where: { id: doctor_id },
+    });
+    return this.resolution.create({
       id: uuid,
       patient_id: patientInfo[0].id,
+      doctor_id,
+      role_id,
       value: resolutionText,
       expire_time: lifetime,
     });
   }
 
-  async getResolution(name) {
-    const patient = await this.patient.findAll({
-      limit: 10,
+  async getResolution(name, offset = 0) {
+    const patient = await this.patient.findOne({
       raw: true,
       where: {
         name: name,
       },
-      order: [['createdAt', 'ASC']],
     });
-    if (patient.length === 0) {
+    if (!patient) {
       throw new Api404Error(`The user named ${name} was not found`);
     }
     const searchedResolution = await this.resolution.findAll({
+      limit: 1,
+      offset: Number(offset),
       raw: true,
       where: {
-        patient_id: patient[0].id,
+        patient_id: patient.id,
       },
       order: [['createdAt', 'ASC']],
     });
+
+    console.log(searchedResolution);
 
     if (searchedResolution.length === 0) {
       throw new Api404Error(
@@ -464,39 +474,39 @@ export default class {
     ) {
       await this.resolution.destroy({
         where: {
-          patient_id: patient[0].id,
+          id: searchedResolution[0].id,
         },
       });
     }
-    return searchedResolution[0].value;
+
+    let data = { ...searchedResolution[0] };
+
+    console.log(data.doctor_id);
+
+    const { name: doctor_name } = await this.doctor.findByPk(data.doctor_id);
+    const { name: patient_name } = await this.patient.findByPk(data.patient_id);
+
+    const { title } = await this.role.findByPk(data.role_id);
+
+    data.doctor_name = doctor_name;
+    data.patient_name = patient_name;
+    data.role = title;
+
+    delete data.doctor_id;
+    delete data.role_id;
+    delete data.patient_id;
+    delete data.expire_time;
+    delete data.updatedAt;
+
+    return data;
   }
 
-  async deleteResolution(name) {
-    const patient = await this.patient.findAll({
-      limit: 1,
-      raw: true,
+  async deleteResolution(id) {
+    return this.resolution.destroy({
       where: {
-        name: name,
-      },
-      order: [['createdAt', 'ASC']],
-    });
-    const searchedResolution = await this.resolution.findAll({
-      limit: 1,
-      raw: true,
-      where: {
-        patient_id: patient[0].id,
-      },
-      order: [['createdAt', 'ASC']],
-    });
-    if (searchedResolution.length === 0) {
-      throw new Api404Error(`This patient has no resolutions`);
-    }
-    await this.resolution.destroy({
-      where: {
-        patient_id: patient[0].id,
+        id,
       },
     });
-    return searchedResolution[0].value;
   }
 
   async fetchRoles() {

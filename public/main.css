@@ -216,3 +216,17 @@ input {
 #doctors-dropdown {
   display: none;
 }
+
+#resolution-additional-info {
+  display: none;
+  background-color: blueviolet;
+}
+
+.resolution-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+#resolution-next {
+  margin-top: 10px;
+}

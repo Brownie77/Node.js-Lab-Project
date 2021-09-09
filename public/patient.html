@@ -60,20 +60,38 @@
         </div>
         <div class="search-resolution-wrapper">
           <div class="search-patient-box">
-            <input id="resolution-search-input-patient" type="search" />
+            <input type="search" id="resolution-search-input" />
             <button
               class="bn1"
               type="button"
-              onclick="getResolutionForPatient()"
+              onclick="getResolutionForDoctor()"
             >
               Search Resolution
             </button>
           </div>
-          <div id="patient-resolution-info" class="resolution-info-box">
+          <div id="doctor-resolution-info" class="delete-resolution-info-box">
             <div class="resolution-info-discription">
               <p class="resolution-info-text">Resolution info</p>
             </div>
-            <div class="resolution-info-output"></div>
+            <div
+              class="resolution-info-discription"
+              id="resolution-additional-info"
+            >
+              <p class="resolution-info-text">
+                Signed by <span id="resolution-signed-by"></span>
+              </p>
+            </div>
+            <div id="resolution-info-output"></div>
+          </div>
+          <div class="resolution-buttons">
+            <button
+              class="bn1"
+              type="button"
+              id="resolution-next"
+              onclick="nextResolution()"
+            >
+              Next Resolution
+            </button>
           </div>
         </div>
       </div>

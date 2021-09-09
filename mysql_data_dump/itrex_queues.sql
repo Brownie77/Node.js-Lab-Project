@@ -16,35 +16,34 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `doctors`
+-- Table structure for table `queues`
 --
 
-DROP TABLE IF EXISTS `doctors`;
+DROP TABLE IF EXISTS `queues`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `doctors` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `role_id` int NOT NULL,
-  `user_id` varchar(255) NOT NULL,
+CREATE TABLE `queues` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `patient_id` varchar(255) DEFAULT NULL,
+  `doctor_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `role_id` (`role_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `doctors_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
-  CONSTRAINT `doctors_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `patient_id` (`patient_id`),
+  KEY `doctor_id` (`doctor_id`),
+  CONSTRAINT `queues_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`),
+  CONSTRAINT `queues_ibfk_2` FOREIGN KEY (`doctor_id`) REFERENCES `doctors` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `doctors`
+-- Dumping data for table `queues`
 --
 
-LOCK TABLES `doctors` WRITE;
-/*!40000 ALTER TABLE `doctors` DISABLE KEYS */;
-INSERT INTO `doctors` VALUES ('38ac1cb0-10c8-11ec-8293-af266885135a','Vasiliy',1,'ab3bb1fd-ed5b-4f51-bd48-274ec46a53cc','2021-09-08 17:14:27','2021-09-08 17:14:27'),('38acb8f0-10c8-11ec-8293-af266885135a','Sam',3,'4132f38d-f0f1-4ec8-8bff-422e97d26dac','2021-09-08 17:14:27','2021-09-08 17:14:27'),('38ad0710-10c8-11ec-8293-af266885135a','Ann',1,'c7abb227-57c7-4b22-aae6-7652a78171eb','2021-09-08 17:14:27','2021-09-08 17:14:27');
-/*!40000 ALTER TABLE `doctors` ENABLE KEYS */;
+LOCK TABLES `queues` WRITE;
+/*!40000 ALTER TABLE `queues` DISABLE KEYS */;
+INSERT INTO `queues` VALUES (1,'f0d723ce-12ee-4844-aa83-abbd8c67a76c','38ad0710-10c8-11ec-8293-af266885135a','2021-09-09 21:29:09','2021-09-09 21:29:09'),(2,'f0d723ce-12ee-4844-aa83-abbd8c67a76c','38acb8f0-10c8-11ec-8293-af266885135a','2021-09-09 21:29:31','2021-09-09 21:29:31');
+/*!40000 ALTER TABLE `queues` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -56,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-09-09 16:10:02
+-- Dump completed on 2021-09-10  0:47:41

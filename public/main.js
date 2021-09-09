@@ -7,6 +7,8 @@ const currentPatientNameforPatient = document.getElementById(
 const resolutionText = document.getElementById('resolutionForDoctor');
 let patientData = [];
 let queue = [];
+let offset = 0;
+let selectedResolution = null;
 //addNewPatient - добавить провеку на наличие имени в списке, если есть = добавить предуприждение
 
 window.onload = async function () {
@@ -116,36 +118,6 @@ async function nextPatient() {
   }
 }
 
-async function getResolutionForPatient() {
-  let resolutionText = document.getElementById('resolutionForPatient');
-  let searchResolutionInputValue = document.getElementById(
-    'resolution-search-input-patient',
-  ).value;
-  let resolutionWrap = document.getElementById('resolution-info-output');
-  console.log(resolutionWrap);
-  document.getElementById('resolution-search-input-patient').value = '';
-  if (resolutionText !== null) resolutionText.remove();
-  const data = {
-    name: searchResolutionInputValue,
-  };
-  try {
-    const response = await fetch('http://localhost:3000/api/resolution/get', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    let searchedResolution = await response.json();
-    resolutionWrap.insertAdjacentHTML(
-      'afterbegin',
-      `<p id='resolutionForPatient'>${searchedResolution}</p`,
-    );
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 async function setResolution() {
   let addExpireInputValue = document.getElementById('expireInput').value;
   const data = {
@@ -162,50 +134,49 @@ async function setResolution() {
         },
       },
     );
-    document.getElementById('set-resolution').value =
-      'Patient resolution was successfully updated';
+    document.getElementById('set-resolution').value = '';
   } catch (error) {
     console.error('Ошибка:', error);
   }
 }
 
 async function getResolutionForDoctor() {
-  let searchResolutionInputValue = document.getElementById(
+  document.getElementById('resolution-additional-info').style.display = 'block';
+  document.getElementById('resolutionForDoctor')?.remove();
+  offset = 0;
+  const searchResolutionInputValue = document.getElementById(
     'resolution-search-input',
   ).value;
-  let resolutionWrap = document.getElementById('doctor-resolution-info');
+  const resolutionWrap = document.getElementById('doctor-resolution-info');
   if (resolutionText !== null) {
     resolutionText.remove();
   }
-  const data = {
-    name: searchResolutionInputValue,
-  };
   try {
-    const response = await fetch('http://localhost:3000/api/resolution/get', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    let searchedResolution = await response.json();
+    const response = await fetch(
+      `http://localhost:3000/api/${searchResolutionInputValue}/resolution?offset=${offset}`,
+    );
+    const data = await response.json();
+    selectedResolution = data;
+    document.getElementById('resolution-signed-by').innerHTML = `${
+      data.doctor_name
+    } (${data.role}) - ${new Date(data.createdAt)}`;
     resolutionWrap.insertAdjacentHTML(
       'beforeend',
-      `<p id='resolutionForDoctor'>${searchedResolution}</p`,
+      `<p id='resolutionForDoctor'>${data.value}</p`,
     );
   } catch (error) {
+    document.getElementById('resolution-additional-info').style.display =
+      'none';
     console.error('Ошибка:', error);
   }
 }
 
 async function deleteResolution() {
-  let searchResolutionInputValue = document.getElementById(
-    'resolution-search-input',
-  ).value;
+  offset -= 1;
   if (resolutionText !== null) resolutionText.remove();
   try {
-    const response = await fetch(
-      `http://localhost:3000/api/resolution/${searchResolutionInputValue}`,
+    await fetch(
+      `http://localhost:3000/api/${selectedResolution.patient_name}/resolutions/${selectedResolution.id}`,
       {
         method: 'DELETE',
         headers: {
@@ -213,9 +184,27 @@ async function deleteResolution() {
         },
       },
     );
-    let deletedResolution = await response.json();
-    console.log(deletedResolution);
+    return nextResolution();
   } catch (error) {
     console.error('Ошибка:', error);
+  }
+}
+
+async function nextResolution() {
+  if (!selectedResolution) return;
+  offset += 1;
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/${selectedResolution.patient_name}/resolution?offset=${offset}`,
+    );
+    const data = await response.json();
+    selectedResolution = data;
+
+    document.getElementById('resolution-signed-by').innerHTML = `${
+      data.doctor_name
+    } (${data.role}) - ${new Date(data.createdAt)}`;
+    document.getElementById('resolutionForDoctor').innerHTML = data.value;
+  } catch (error) {
+    console.log(error);
   }
 }

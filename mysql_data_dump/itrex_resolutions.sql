@@ -16,33 +16,38 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `queues`
+-- Table structure for table `resolutions`
 --
 
-DROP TABLE IF EXISTS `queues`;
+DROP TABLE IF EXISTS `resolutions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `queues` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `patient_id` varchar(255) DEFAULT NULL,
+CREATE TABLE `resolutions` (
+  `id` varchar(255) NOT NULL,
+  `patient_id` varchar(255) NOT NULL,
   `doctor_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `role_id` int NOT NULL,
+  `value` text NOT NULL,
+  `expire_time` int DEFAULT NULL,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `patient_id` (`patient_id`),
   KEY `doctor_id` (`doctor_id`),
-  CONSTRAINT `queues_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`),
-  CONSTRAINT `queues_ibfk_2` FOREIGN KEY (`doctor_id`) REFERENCES `doctors` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `role_id` (`role_id`),
+  CONSTRAINT `resolutions_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`),
+  CONSTRAINT `resolutions_ibfk_2` FOREIGN KEY (`doctor_id`) REFERENCES `doctors` (`id`),
+  CONSTRAINT `resolutions_ibfk_3` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `queues`
+-- Dumping data for table `resolutions`
 --
 
-LOCK TABLES `queues` WRITE;
-/*!40000 ALTER TABLE `queues` DISABLE KEYS */;
-/*!40000 ALTER TABLE `queues` ENABLE KEYS */;
+LOCK TABLES `resolutions` WRITE;
+/*!40000 ALTER TABLE `resolutions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `resolutions` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -54,4 +59,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-09-09 16:10:02
+-- Dump completed on 2021-09-10  0:47:41
