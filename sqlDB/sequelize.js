@@ -329,6 +329,7 @@ export default class {
     }
   }
 
+
   async createPatientAndAddToQueue(patientName, userId, role, doctor) {
     const exist = await this.patient.findOne({
       raw: true,
@@ -345,6 +346,29 @@ export default class {
         user_id: userId,
       });
       return this.addToQueue(patient_id, role, doctor);
+    async createPatientAndReturnCurrentPatient(patientName, userId) {
+        await this.patient.sync()
+        const patient_id = crypto.randomUUID({
+            disableEntropyCache: true
+        });
+        await this.patient.create({
+            id: patient_id,
+            name: patientName,
+            user_id: userId,
+        })
+        await this.addToQueue(patient_id);
+        const currentPatientInQueue = await this.getCurrentInQueue();
+        return currentPatientInQueue;
+    }
+    async createPatient(name) {
+        const patient_id = crypto.randomUUID({
+            disableEntropyCache: true
+        });
+        await this.Patient.create({
+            id: patient_id,
+            name
+        })
+        this.addToQueue(patient_id)
     }
     return this.addToQueue(exist.id, role, doctor);
   }
