@@ -1,58 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap" rel="stylesheet">
-    <link href="main.css" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap"
+      rel="stylesheet"
+    />
+    <link href="main.css" rel="stylesheet" />
     <title>Document</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <div class="doctor-view">
-            <div class="current-patient-wrapper">
-                <div class="current-patient">
-                    <p class="definition">Current patient:</p>
-                    <p id="doctors-current-patient" class="output-info">Press 'next'</p>
-                </div>
-                <div class="next-button-wrap">
-                    <button class="next-patient-btn bn1"  type="button" onclick="nextPatient()">Next</button>
-                </div>
-            </div>
-            <div class="set-resolution-wrapper">
-                <p class="definition">Set appointment resolution</p>
-                <textarea id="set-resolution" rows="7" cols="80"></textarea>
-                <div class="set-resolution-panel">
-                    <label class="definition" for="expireInput">Determine expiration of patients's resolution (seconds):</label>
-                    <input type="number" id="expireInput" name="expireInput">
-                    <button class="bn1 add-resolution-btn" type="button" onclick="setResolution()">Add</button>
-                </div>
-
-            </div>
-            <div class="delete-resolution-wrapper">
-                <div class="search-patient-box">
-                    <input type="search" id="resolution-search-input">
-                    <button class="bn1" type="button" onclick="getResolutionForDoctor()">Search Resolution</button>
-                </div>
-                <div id="doctor-resolution-info" class="delete-resolution-info-box">
-                    <div class="resolution-info-discription">
-                        <p class="resolution-info-text">Resolution info</p>
-                    </div>
-                    <div id="resolution-info-output"></div>
-                </div>
-                <button class="bn1" type="button" onclick="deleteResolution()">Delete Resolution</button>
-            </div>
+      <div class="doctor-view">
+        <div class="current-patient-wrapper">
+          <div class="current-patient">
+            <p class="definition">Current patient:</p>
+            <p id="doctors-current-patient" class="output-info">Press 'next'</p>
+          </div>
+          <div class="next-button-wrap">
+            <button
+              class="next-patient-btn bn1"
+              type="button"
+              onclick="nextPatient()"
+            >
+              Next
+            </button>
+          </div>
         </div>
+        <div class="set-resolution-wrapper">
+          <p class="definition">Set appointment resolution</p>
+          <textarea id="set-resolution" rows="7" cols="80"></textarea>
+          <div class="set-resolution-panel">
+            <label class="definition" for="expireInput"
+              >Determine expiration of patients's resolution (seconds):</label
+            >
+            <input type="number" id="expireInput" name="expireInput" />
+            <button
+              class="bn1 add-resolution-btn"
+              type="button"
+              onclick="setResolution()"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+        <div class="delete-resolution-wrapper">
+          <div class="search-patient-box">
+            <input type="search" id="resolution-search-input" />
+            <button
+              class="bn1"
+              type="button"
+              onclick="getResolutionForDoctor()"
+            >
+              Search Resolution
+            </button>
+          </div>
+          <div id="doctor-resolution-info" class="delete-resolution-info-box">
+            <div class="resolution-info-discription">
+              <p class="resolution-info-text">Resolution info</p>
+            </div>
+            <div
+              class="resolution-info-discription"
+              id="resolution-additional-info"
+            >
+              <p class="resolution-info-text">
+                Signed by <span id="resolution-signed-by"></span>
+              </p>
+            </div>
+            <div id="resolution-info-output"></div>
+          </div>
+          <div class="resolution-buttons">
+            <button class="bn1" type="button" onclick="deleteResolution()">
+              Delete Resolution
+            </button>
+            <button
+              class="bn1"
+              type="button"
+              id="resolution-next"
+              onclick="nextResolution()"
+            >
+              Next Resolution
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="main.js"></script>
-</body>
-
+  </body>
 </html>

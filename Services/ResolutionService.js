@@ -1,20 +1,15 @@
 import Database from '../dbDriver.js';
 class ResolutionService {
-    async createResolution(resolutionText, lifetime) {
-        const createdResolution = await Database.createResolution(resolutionText, lifetime);
-        return createdResolution;
-    }
+  async createResolution(resolutionText, lifetime, token) {
+    return Database.createResolution(resolutionText, lifetime, token);
+  }
 
-    async getResolution(name) {
-        const resolution = await Database.getResolution(name);
-            return resolution;
-    }
-    async deleteResolution(name) {
-        const deleteResolution = await Database.deleteResolution(name);
-        return deleteResolution;
-
-    }
+  async getResolution(name, offset) {
+    return Database.getResolution(name, offset);
+  }
+  async deleteResolution(id) {
+    return Database.deleteResolution(id);
+  }
 }
-
 
 export default new ResolutionService();

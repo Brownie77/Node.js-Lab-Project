@@ -1,0 +1,7 @@
+pre-created doctor accounts:
+login: sugeon@gmail.com, pasword: 1234
+login: sugeon2@gmail.com, pasword: 1234
+login: vasya.puplin@gmail.com, pasword: 1234
+
+pre-created specializations:
+surgeon (2 doctors), optometrist (1 doctor), pediatrician (0 doctors)

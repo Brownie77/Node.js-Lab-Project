@@ -1,4 +1,3 @@
-// import Database from '../dbDriver.js';
 export default class PatientService {
     constructor(database) {
         this.database = database;
@@ -29,5 +28,4 @@ export default class PatientService {
     }
 }
 
-// export default new PatientService(Database);
 
